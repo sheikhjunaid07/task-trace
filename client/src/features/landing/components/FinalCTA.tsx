@@ -97,7 +97,7 @@ export function FinalCTA() {
 
         <Reveal delay={0.18}>
           <p className="mx-auto mt-7 max-w-xl text-[17px] leading-relaxed text-white/55">
-            Join teams that move faster with TaskFlow. Set up your first board
+            Join teams that move faster with TaskTrace. Set up your first board
             in under a minute — no credit card required.
           </p>
         </Reveal>

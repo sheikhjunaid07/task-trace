@@ -91,7 +91,7 @@ export function Hero() {
             variants={item}
             className="mt-7 max-w-lg text-[17px] leading-relaxed text-mute sm:text-lg"
           >
-            TaskFlow brings tasks, teams, discussions, and workflows into one
+            TaskTrace brings tasks, teams, discussions, and workflows into one
             beautifully designed workspace.
           </motion.p>
 

@@ -41,7 +41,7 @@ export const RegisterPage: React.FC = () => {
   useEffect(() => {
     if (workspaceParam || inviteCodeParam) {
       sessionStorage.setItem(
-        'taskflow_pending_invite',
+        'tasktrace_pending_invite',
         JSON.stringify({ workspace: workspaceParam, inviteCode: inviteCodeParam })
       );
     }

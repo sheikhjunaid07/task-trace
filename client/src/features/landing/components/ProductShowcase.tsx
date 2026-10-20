@@ -67,7 +67,7 @@ export function ProductShowcase() {
               <br className="hidden sm:block" /> <span className="lp-text-gradient">Zero context switching.</span>
             </>
           }
-          description="The TaskFlow dashboard brings your whole project into a single, beautiful surface — boards, people, analytics, and history."
+          description="The TaskTrace dashboard brings your whole project into a single, beautiful surface — boards, people, analytics, and history."
         />
 
         <Reveal delay={0.1} y={40}>
@@ -91,7 +91,7 @@ export function ProductShowcase() {
                     <span className="flex h-3 w-3 items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)' }}>
                       <Kanban className="h-2 w-2 text-white" strokeWidth={3} />
                     </span>
-                    <span className="text-[10px] font-medium text-faint">taskflow.app/acme/product-launch</span>
+                    <span className="text-[10px] font-medium text-faint">tasktrace.app/acme/product-launch</span>
                   </div>
                   <div className="flex items-center gap-2 text-faint">
                     <Search className="h-3.5 w-3.5" />
@@ -107,7 +107,7 @@ export function ProductShowcase() {
                       <span className="flex h-6 w-6 items-center justify-center rounded-lg" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)' }}>
                         <Kanban className="h-3 w-3 text-white" strokeWidth={2.6} />
                       </span>
-                      <span className="text-[11px] font-extrabold tracking-tight text-ink">TaskFlow</span>
+                      <span className="text-[11px] font-extrabold tracking-tight text-ink">TaskTrace</span>
                     </div>
                     <div className="flex flex-col gap-0.5">
                       {[

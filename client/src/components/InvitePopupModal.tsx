@@ -40,7 +40,7 @@ export const InvitePopupModal: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const workspaceParam = params.get('workspace') || params.get('inviteWorkspace');
     const codeParam = params.get('inviteCode');
-    const storedInvite = sessionStorage.getItem('taskflow_pending_invite');
+    const storedInvite = sessionStorage.getItem('tasktrace_pending_invite');
 
     let targetWorkspace = workspaceParam || '';
     let targetCode = codeParam || '';
@@ -50,9 +50,9 @@ export const InvitePopupModal: React.FC = () => {
         const parsed = JSON.parse(storedInvite);
         targetWorkspace = parsed.workspace || '';
         targetCode = parsed.inviteCode || '';
-        sessionStorage.removeItem('taskflow_pending_invite');
+        sessionStorage.removeItem('tasktrace_pending_invite');
       } catch {
-        sessionStorage.removeItem('taskflow_pending_invite');
+        sessionStorage.removeItem('tasktrace_pending_invite');
       }
     }
 
@@ -83,7 +83,7 @@ export const InvitePopupModal: React.FC = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    sessionStorage.removeItem('taskflow_pending_invite');
+    sessionStorage.removeItem('tasktrace_pending_invite');
     const cleanParams = new URLSearchParams(location.search);
     cleanParams.delete('workspace');
     cleanParams.delete('inviteWorkspace');
@@ -190,7 +190,7 @@ export const InvitePopupModal: React.FC = () => {
                 <span className="text-xs font-bold text-ink block truncate max-w-[180px]">
                   {inviteName || 'Project Workspace'}
                 </span>
-                <span className="text-[10px] text-mute block">TaskFlow Collaborative Board</span>
+                <span className="text-[10px] text-mute block">TaskTrace Collaborative Board</span>
               </div>
             </div>
 

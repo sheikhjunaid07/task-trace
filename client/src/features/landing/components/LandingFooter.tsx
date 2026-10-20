@@ -48,7 +48,7 @@ export function LandingFooter() {
               <div className="brand-mark h-8 w-8">
                 <Kanban className="h-5 w-5" strokeWidth={2.4} />
               </div>
-              <span className="text-[17px] font-extrabold tracking-tight text-ink">TaskFlow</span>
+              <span className="text-[17px] font-extrabold tracking-tight text-ink">TaskTrace</span>
             </Link>
             <p className="mt-4 text-[13.5px] leading-relaxed text-mute">
               The collaborative workspace where modern teams ship work that matters.
@@ -94,7 +94,7 @@ export function LandingFooter() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-edge pt-7 sm:flex-row">
           <p className="text-[12.5px] font-medium text-faint">
-            © 2026 TaskFlow, Inc. All rights reserved.
+            © 2026 TaskTrace, Inc. All rights reserved.
           </p>
           <div className="flex gap-6 text-[12.5px] font-medium text-faint">
             <a href="#" className="transition-colors hover:text-ink">Privacy</a>

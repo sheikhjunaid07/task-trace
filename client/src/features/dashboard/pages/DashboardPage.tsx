@@ -477,7 +477,7 @@ export const DashboardPage: React.FC = () => {
 
               <h3 className="text-xl font-bold text-white mb-1">Create New Project</h3>
               <p className="text-xs text-slate-200 font-medium mb-6">
-                Start a real-time Kanban project in TaskFlow
+                Start a real-time Kanban project in TaskTrace
               </p>
 
               {createError && (

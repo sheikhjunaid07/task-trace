@@ -27,7 +27,7 @@ export const THEMES: { id: ThemeId; name: string; swatch: string[] }[] = [
   { id: "rose", name: "Rose Gold", swatch: ["#0f0b0c", "#22191c", "#d977a7"] },
 ];
 
-const STORAGE_KEY = "taskflow-theme";
+const STORAGE_KEY = "tasktrace-theme";
 const DEFAULT_THEME: ThemeId = "obsidian";
 
 interface ThemeContextValue {

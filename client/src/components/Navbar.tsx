@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
             <Kanban className="w-5 h-5 text-white" />
           </div>
           <span className="font-black text-xl tracking-tight text-white">
-            TaskFlow
+            TaskTrace
           </span>
         </Link>
 

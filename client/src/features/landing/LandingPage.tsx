@@ -4,7 +4,7 @@ import { TrustBar } from './components/TrustBar';
 import { FeatureShowcase } from './components/FeatureShowcase';
 import { WorkflowSection } from './components/WorkflowSection';
 import { ProductShowcase } from './components/ProductShowcase';
-import { WhyTaskFlow } from './components/WhyTaskFlow';
+import { WhyTaskTrace } from './components/WhyTaskTrace';
 import { Testimonials } from './components/Testimonials';
 import { StatsSection } from './components/StatsSection';
 import { PricingSection } from './components/PricingSection';
@@ -19,7 +19,7 @@ export function LandingPage() {
       <FeatureShowcase />
       <WorkflowSection />
       <ProductShowcase />
-      <WhyTaskFlow />
+      <WhyTaskTrace />
       <Testimonials />
       <StatsSection />
       <PricingSection />

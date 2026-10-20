@@ -32,7 +32,7 @@ const CARDS: {
   {
     icon: Workflow,
     title: 'Flexible Workflows',
-    text: 'Kanban, lists, and custom stages. Shape TaskFlow around the way your team actually works.',
+    text: 'Kanban, lists, and custom stages. Shape TaskTrace around the way your team actually works.',
     glow: 'var(--accent)',
   },
   {
@@ -55,14 +55,14 @@ const CARDS: {
   },
 ];
 
-export function WhyTaskFlow() {
+export function WhyTaskTrace() {
   return (
     <section id="why" className="relative overflow-hidden py-28 lg:py-36">
       <div className="lp-noise" />
 
       <div className="relative z-10 mx-auto max-w-[1240px] px-5 sm:px-8">
         <SectionHeading
-          eyebrow="Why TaskFlow"
+          eyebrow="Why TaskTrace"
           title={
             <>
               Designed for teams that

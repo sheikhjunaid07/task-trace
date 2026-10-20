@@ -53,7 +53,7 @@ export function LandingNavbar() {
               <Kanban className="h-5 w-5" strokeWidth={2.4} />
             </div>
             <span className="text-[17px] font-extrabold tracking-tight text-ink">
-              TaskFlow
+              TaskTrace
             </span>
           </Link>
 

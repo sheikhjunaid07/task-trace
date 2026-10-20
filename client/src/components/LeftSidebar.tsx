@@ -22,7 +22,7 @@ export const LeftSidebar: React.FC = () => {
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('taskflow_sidebar_collapsed');
+      const saved = localStorage.getItem('tasktrace_sidebar_collapsed');
       if (saved !== null) {
         return saved === 'true';
       }
@@ -47,7 +47,7 @@ export const LeftSidebar: React.FC = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem('taskflow_sidebar_collapsed', String(next));
+        localStorage.setItem('tasktrace_sidebar_collapsed', String(next));
       } catch (e) {
         // ignore storage error
       }

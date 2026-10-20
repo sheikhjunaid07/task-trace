@@ -544,7 +544,7 @@ export function FeatureShowcase() {
               <br className="hidden sm:block" /> to stay <span className="lp-text-gradient">aligned.</span>
             </>
           }
-          description="Six capabilities, one seamless surface. TaskFlow is built to disappear into your workflow while keeping every signal visible."
+          description="Six capabilities, one seamless surface. TaskTrace is built to disappear into your workflow while keeping every signal visible."
         />
 
         <div className="mt-14 sm:mt-24 flex flex-col gap-16 sm:gap-24 lg:gap-36">

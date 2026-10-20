@@ -7,7 +7,7 @@ const G = (a: string, b: string) => `linear-gradient(135deg,${a},${b})`;
 
 const TESTIMONIALS = [
   {
-    quote: 'TaskFlow completely changed how our team manages projects.',
+    quote: 'TaskTrace completely changed how our team manages projects.',
     name: 'Ava Reed',
     role: 'VP Product · Northwind',
     g: G('#8b5cf6', '#a855f7'),
@@ -27,7 +27,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      'We replaced three tools with TaskFlow. The team has never been this aligned before a launch.',
+      'We replaced three tools with TaskTrace. The team has never been this aligned before a launch.',
     name: 'Sara Kim',
     role: 'Engineering Manager · Delta',
     g: G('#3b82f6', '#06b6d4'),

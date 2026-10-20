@@ -1,4 +1,4 @@
-# 🚀 TaskFlow — Real-Time Collaborative Kanban Board
+# 🚀 TaskTrace — Real-Time Collaborative Kanban Board
 
 A modern, high-performance, real-time collaborative Kanban application built with **React 19**, **Vite**, **TypeScript**, **Redux Toolkit**, **Socket.io**, **Node.js**, **Express**, **MongoDB**, and **Cloudinary**.
 
@@ -71,7 +71,7 @@ A modern, high-performance, real-time collaborative Kanban application built wit
 │   │   │   ├── auth/           # Login & Register views
 │   │   │   ├── board/          # Board details, header, filter bar, members modal, analytics
 │   │   │   ├── kanban/         # Kanban board, columns, task cards, task modal, comments, typing indicator
-│   │   │   └── landing/        # TaskFlow landing page
+│   │   │   └── landing/        # TaskTrace landing page
 │   │   ├── routes/             # AppRoutes & ProtectedRoute wrapper
 │   │   └── sockets/            # Socket.io connection & useSocketEvents hook
 │   └── vite.config.ts
