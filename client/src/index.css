@@ -261,6 +261,7 @@
 /* Elements on dark/colored backgrounds retain true white text in Editorial */
 [data-theme="editorial"] .btn-primary,
 [data-theme="editorial"] .brand-mark,
+[data-theme="editorial"] .brand-mark *,
 [data-theme="editorial"] .avatar,
 [data-theme="editorial"] .lp-avatar-ring,
 [data-theme="editorial"] [class*="bg-indigo-6"],
@@ -278,11 +279,18 @@
 }
 
 [data-theme="editorial"] .btn-primary *,
+[data-theme="editorial"] .brand-mark,
+[data-theme="editorial"] .brand-mark *,
+[data-theme="editorial"] .brand-mark svg,
+[data-theme="editorial"] .brand-mark .text-white,
+[data-theme="editorial"] [style*="linear-gradient"] .text-white,
+[data-theme="editorial"] [style*="linear-gradient"] svg.text-white,
 [data-theme="editorial"] [class*="bg-indigo-6"] .text-white,
 [data-theme="editorial"] [class*="bg-purple-6"] .text-white,
 [data-theme="editorial"] [class*="bg-emerald-6"] .text-white,
 [data-theme="editorial"] [class*="bg-rose-5"] .text-white {
   color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 [data-theme="editorial"] .prio-badge {
@@ -1032,11 +1040,16 @@
   justify-content: center;
   border-radius: 12px;
   background-image: var(--grad-accent);
-  color: var(--on-accent);
+  color: var(--on-accent, #ffffff);
   box-shadow: 0 6px 24px -6px var(--glow);
   transition:
     transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1.05),
     box-shadow 0.25s ease;
+}
+.brand-mark svg,
+.brand-mark * {
+  color: inherit;
+  stroke: currentColor;
 }
 .brand-mark:hover {
   transform: scale(1.06) rotate(-3deg);

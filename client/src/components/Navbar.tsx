@@ -59,7 +59,7 @@ export const Navbar: React.FC = () => {
       <div className="flex items-center space-x-3 sm:space-x-5">
         <Link to="/dashboard" className="flex items-center space-x-2.5 group">
           <div className="brand-mark w-9 h-9">
-            <Kanban className="w-5 h-5 text-white" />
+            <Kanban className="w-5 h-5" />
           </div>
           <span className="font-black text-xl tracking-tight text-ink">
             TaskTrace

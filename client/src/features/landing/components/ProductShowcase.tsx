@@ -88,8 +88,8 @@ export function ProductShowcase() {
                     <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e]/70" />
                   </div>
                   <div className="mx-auto flex w-full max-w-sm items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--bg)_60%,transparent)] px-3.5 py-1.5">
-                    <span className="flex h-3 w-3 items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)' }}>
-                      <Kanban className="h-2 w-2 text-white" strokeWidth={3} />
+                    <span className="flex h-3 w-3 items-center justify-center rounded-full text-white" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)', color: '#ffffff' }}>
+                      <Kanban className="h-2 w-2" strokeWidth={3} style={{ color: '#ffffff', stroke: '#ffffff' }} />
                     </span>
                     <span className="text-[10px] font-medium text-faint">tasktrace.app/acme/product-launch</span>
                   </div>
@@ -104,8 +104,8 @@ export function ProductShowcase() {
                   {/* ── sidebar ── */}
                   <div className="hidden w-44 shrink-0 flex-col border-r border-edge p-3 md:flex">
                     <div className="mb-4 flex items-center gap-2 px-1.5">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-lg" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)' }}>
-                        <Kanban className="h-3 w-3 text-white" strokeWidth={2.6} />
+                      <span className="flex h-6 w-6 items-center justify-center rounded-lg text-white" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)', color: '#ffffff' }}>
+                        <Kanban className="h-3 w-3" strokeWidth={2.6} style={{ color: '#ffffff', stroke: '#ffffff' }} />
                       </span>
                       <span className="text-[11px] font-extrabold tracking-tight text-ink">TaskTrace</span>
                     </div>
