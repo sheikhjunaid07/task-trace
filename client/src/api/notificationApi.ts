@@ -1,5 +1,5 @@
-import { baseApi } from './baseApi';
-import type { AppNotification } from '../types';
+import { baseApi } from "./baseApi";
+import type { AppNotification } from "../types";
 
 export interface NotificationsResponse {
   statusCode: number;
@@ -13,22 +13,48 @@ export interface NotificationsResponse {
 export const notificationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getNotifications: builder.query<NotificationsResponse, void>({
-      query: () => '/notifications',
-      providesTags: [{ type: 'Notification', id: 'LIST' }],
+      query: () => "/notifications",
+      providesTags: [{ type: "Notification", id: "LIST" }],
     }),
-    markAsRead: builder.mutation<{ statusCode: number; message: string }, string>({
+    markAsRead: builder.mutation<
+      { statusCode: number; message: string },
+      string
+    >({
       query: (notificationId) => ({
         url: `/notifications/${notificationId}/read`,
-        method: 'PATCH',
+        method: "PATCH",
       }),
-      invalidatesTags: [{ type: 'Notification', id: 'LIST' }],
+      invalidatesTags: [{ type: "Notification", id: "LIST" }],
     }),
-    markAllAsRead: builder.mutation<{ statusCode: number; message: string }, void>({
+    markAllAsRead: builder.mutation<
+      { statusCode: number; message: string },
+      void
+    >({
       query: () => ({
-        url: '/notifications/read-all',
-        method: 'PATCH',
+        url: "/notifications/read-all",
+        method: "PATCH",
       }),
-      invalidatesTags: [{ type: 'Notification', id: 'LIST' }],
+      invalidatesTags: [{ type: "Notification", id: "LIST" }],
+    }),
+    deleteNotification: builder.mutation<
+      { statusCode: number; message: string },
+      string
+    >({
+      query: (notificationId) => ({
+        url: `/notifications/${notificationId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Notification", id: "LIST" }],
+    }),
+    clearAllNotifications: builder.mutation<
+      { statusCode: number; message: string },
+      void
+    >({
+      query: () => ({
+        url: "/notifications/clear-all",
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Notification", id: "LIST" }],
     }),
   }),
 });
@@ -37,4 +63,6 @@ export const {
   useGetNotificationsQuery,
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
+  useDeleteNotificationMutation,
+  useClearAllNotificationsMutation,
 } = notificationApi;

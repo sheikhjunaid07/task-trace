@@ -47,11 +47,23 @@ export interface Invitation {
   updatedAt?: string;
 }
 
+export type NotificationType =
+  | 'BOARD_INVITATION'
+  | 'TASK_MENTION'
+  | 'PROJECT_CREATED'
+  | 'TASK_CREATED'
+  | 'TASK_MOVED'
+  | 'TASK_UPDATED'
+  | 'TASK_DELETED'
+  | 'PROJECT_DELETED'
+  | 'MEMBER_JOINED'
+  | 'GENERAL';
+
 export interface AppNotification {
   _id: string;
   recipient: string;
   sender: User;
-  type: 'BOARD_INVITATION' | 'TASK_MENTION';
+  type: NotificationType;
   title: string;
   message: string;
   board?: Board;

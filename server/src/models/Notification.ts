@@ -1,10 +1,22 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+export type NotificationType =
+  | "BOARD_INVITATION"
+  | "TASK_MENTION"
+  | "PROJECT_CREATED"
+  | "TASK_CREATED"
+  | "TASK_MOVED"
+  | "TASK_UPDATED"
+  | "TASK_DELETED"
+  | "PROJECT_DELETED"
+  | "MEMBER_JOINED"
+  | "GENERAL";
+
 export interface INotification {
   _id?: Types.ObjectId;
   recipient: Types.ObjectId;
   sender: Types.ObjectId;
-  type: "BOARD_INVITATION" | "TASK_MENTION";
+  type: NotificationType;
   title: string;
   message: string;
   board?: Types.ObjectId;
@@ -21,7 +33,18 @@ const notificationSchema = new Schema<INotification>(
     sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
     type: {
       type: String,
-      enum: ["BOARD_INVITATION", "TASK_MENTION"],
+      enum: [
+        "BOARD_INVITATION",
+        "TASK_MENTION",
+        "PROJECT_CREATED",
+        "TASK_CREATED",
+        "TASK_MOVED",
+        "TASK_UPDATED",
+        "TASK_DELETED",
+        "PROJECT_DELETED",
+        "MEMBER_JOINED",
+        "GENERAL",
+      ],
       required: true,
     },
     title: { type: String, required: true },

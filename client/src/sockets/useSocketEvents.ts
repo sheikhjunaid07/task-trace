@@ -7,6 +7,7 @@ import { commentApi } from '../api/commentApi';
 import { activityApi } from '../api/activityApi';
 import type { Task } from '../types';
 import type { RootState } from '../app/store';
+import { showToast } from '../components/ToastNotification';
 
 export type ConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
 
@@ -119,6 +120,16 @@ export const useSocketEvents = (boardId: string | undefined) => {
           })
         );
         dispatch(activityApi.util.invalidateTags([{ type: 'Activity', id: boardId }]));
+
+        if (payload.actorId && payload.actorId !== currentUserId) {
+          showToast({
+            type: 'TASK_CREATED',
+            title: 'Task Added',
+            message: `Task "${payload.task.title}" added to board`,
+            boardId,
+            taskId: payload.task._id,
+          });
+        }
       }
     };
 
@@ -151,6 +162,16 @@ export const useSocketEvents = (boardId: string | undefined) => {
             }
           })
         );
+
+        if (payload.actorId && payload.actorId !== currentUserId) {
+          showToast({
+            type: 'TASK_MOVED',
+            title: 'Task Moved',
+            message: `Task "${payload.task?.title || 'Task'}" was moved`,
+            boardId,
+            taskId: payload.taskId,
+          });
+        }
       }
     };
 
@@ -175,6 +196,16 @@ export const useSocketEvents = (boardId: string | undefined) => {
             }
           })
         );
+
+        if (payload.actorId && payload.actorId !== currentUserId) {
+          showToast({
+            type: 'TASK_UPDATED',
+            title: 'Task Updated',
+            message: `Task "${payload.task.title}" updated`,
+            boardId,
+            taskId: payload.taskId,
+          });
+        }
       }
     };
 
@@ -195,6 +226,16 @@ export const useSocketEvents = (boardId: string | undefined) => {
             draft.data = draft.data.filter((t: Task) => t._id !== payload.taskId);
           })
         );
+
+        if (payload.actorId && payload.actorId !== currentUserId) {
+          showToast({
+            type: 'TASK_DELETED',
+            title: 'Task Deleted',
+            message: 'A task was deleted from this board',
+            boardId,
+            taskId: payload.taskId,
+          });
+        }
       }
     };
 

@@ -39,6 +39,5 @@ export const connectSocket = (token?: string) => {
 export const disconnectSocket = () => {
   if (socketInstance) {
     socketInstance.disconnect();
-    socketInstance = null;
   }
 };

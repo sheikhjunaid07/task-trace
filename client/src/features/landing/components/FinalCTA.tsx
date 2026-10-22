@@ -88,7 +88,7 @@ export function FinalCTA() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <h2 className="lp-hero-title mt-8 text-white">
+          <h2 className="lp-hero-title mt-8 text-ink">
             Ready to bring clarity
             <br />
             to your <span className="lp-text-gradient">workflow?</span>
@@ -96,7 +96,7 @@ export function FinalCTA() {
         </Reveal>
 
         <Reveal delay={0.18}>
-          <p className="mx-auto mt-7 max-w-xl text-[17px] leading-relaxed text-white/55">
+          <p className="mx-auto mt-7 max-w-xl text-[17px] leading-relaxed text-mute">
             Join teams that move faster with TaskTrace. Set up your first board
             in under a minute — no credit card required.
           </p>
@@ -113,7 +113,7 @@ export function FinalCTA() {
             </Link>
             <Link
               to="/register"
-              className="btn lp-glass h-14 rounded-full px-8 text-[15px] font-semibold text-white"
+              className="btn lp-glass h-14 rounded-full px-8 text-[15px] font-semibold text-ink"
             >
               <CalendarClock className="h-5 w-5" style={{ color: 'var(--accent)' }} />
               Book Demo
@@ -122,7 +122,7 @@ export function FinalCTA() {
         </Reveal>
 
         <Reveal delay={0.34}>
-          <p className="mt-8 text-[12.5px] font-medium text-white/35">
+          <p className="mt-8 text-[12.5px] font-medium text-faint">
             Free forever plan · Cancel anytime · 2-minute setup
           </p>
         </Reveal>

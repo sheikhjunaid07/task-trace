@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { showToast } from './ToastNotification';
 
 export const LeftSidebar: React.FC = () => {
   const location = useLocation();
@@ -71,6 +72,11 @@ export const LeftSidebar: React.FC = () => {
 
     try {
       await createBoard({ name: title.trim(), title: title.trim(), description: description.trim() }).unwrap();
+      showToast({
+        type: 'PROJECT_CREATED',
+        title: 'Project Created',
+        message: `Project "${title.trim()}" created successfully`,
+      });
       setTitle('');
       setDescription('');
       setIsCreateModalOpen(false);
@@ -144,7 +150,7 @@ export const LeftSidebar: React.FC = () => {
                 </div>
               </div>
 
-              <h2 className="text-base font-bold text-white tracking-tight leading-snug truncate" title={currentProjectName}>
+              <h2 className="text-base font-bold text-ink tracking-tight leading-snug truncate" title={currentProjectName}>
                 {currentProjectName}
               </h2>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -168,12 +174,12 @@ export const LeftSidebar: React.FC = () => {
             } ${
               isDashboardActive
                 ? 'bg-purple-600/35 text-white border border-purple-500/60 shadow-sm font-bold'
-                : 'text-slate-200 hover:text-white hover:bg-white/10 border border-transparent font-medium'
+                : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
             }`}
             title="Dashboard"
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <LayoutDashboard className={`w-4 h-4 ${isDashboardActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`} />
+              <LayoutDashboard className={`w-4 h-4 ${isDashboardActive ? 'text-white' : 'text-mute group-hover:text-ink'}`} />
             </div>
             {!isCollapsed && <span className="truncate">Dashboard</span>}
           </Link>
@@ -188,12 +194,12 @@ export const LeftSidebar: React.FC = () => {
             } ${
               isProjectsActive && !isDashboardActive
                 ? 'bg-purple-600/35 text-white border border-purple-500/60 shadow-sm font-bold'
-                : 'text-slate-200 hover:text-white hover:bg-white/10 border border-transparent font-medium'
+                : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
             }`}
             title="Projects & Tasks"
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <FolderKanban className={`w-4 h-4 ${isProjectsActive && !isDashboardActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`} />
+              <FolderKanban className={`w-4 h-4 ${isProjectsActive && !isDashboardActive ? 'text-white' : 'text-mute group-hover:text-ink'}`} />
             </div>
             {!isCollapsed && <span className="truncate">Projects & Tasks</span>}
           </Link>
@@ -208,12 +214,12 @@ export const LeftSidebar: React.FC = () => {
             } ${
               isTeamActive
                 ? 'bg-purple-600/35 text-white border border-purple-500/60 shadow-sm font-bold'
-                : 'text-slate-200 hover:text-white hover:bg-white/10 border border-transparent font-medium'
+                : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
             }`}
             title="Team Members"
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <Users className={`w-4 h-4 ${isTeamActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`} />
+              <Users className={`w-4 h-4 ${isTeamActive ? 'text-white' : 'text-mute group-hover:text-ink'}`} />
             </div>
             {!isCollapsed && <span className="truncate">Team Members</span>}
           </Link>

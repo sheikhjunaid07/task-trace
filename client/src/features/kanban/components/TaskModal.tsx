@@ -7,6 +7,8 @@ import { X, Trash2, User as UserIcon } from 'lucide-react';
 import { CommentSection } from './CommentSection';
 import { TypingIndicator } from './TypingIndicator';
 import { RichTextEditor } from '../../../components/RichTextEditor';
+import { showToast } from '../../../components/ToastNotification';
+import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
 import type { TypingUser } from '../../../sockets/useSocketEvents';
 import { motion } from 'framer-motion';
 
@@ -42,6 +44,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     task.assignees ? task.assignees.map((a) => (typeof a === 'string' ? a : a._id)) : []
   );
   const [conflictError, setConflictError] = useState<string | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
+  const resolvedBoardId =
+    boardId ||
+    (typeof task.board === 'string' ? task.board : (task.board as any)?._id) ||
+    '';
 
   useEffect(() => {
     setTitle(task.title);
@@ -62,7 +70,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       setConflictError(null);
       await updateTask({
         taskId: task._id,
-        boardId,
+        boardId: resolvedBoardId,
         title,
         description,
         priority,
@@ -70,6 +78,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         assignees: selectedAssignees,
         version: task.version,
       }).unwrap();
+      showToast({
+        type: 'TASK_UPDATED',
+        title: 'Task Updated',
+        message: `Task "${title.trim()}" updated successfully`,
+      });
       onTypingStop(task._id);
       handleClose();
     } catch (err: any) {
@@ -83,14 +96,28 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     }
   };
 
-  const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this task?')) {
-      try {
-        await deleteTask({ taskId: task._id, boardId }).unwrap();
-        handleClose();
-      } catch (err) {
-        console.error('Failed to delete task', err);
-      }
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteTask({ taskId: task._id, boardId: resolvedBoardId }).unwrap();
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Task Deleted',
+        message: `Task "${task.title}" deleted`,
+      });
+      setIsDeleteConfirmOpen(false);
+      handleClose();
+    } catch (err) {
+      console.error('Failed to delete task', err);
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Delete Failed',
+        message: 'Failed to delete task',
+      });
     }
   };
 
@@ -248,9 +275,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         {/* Modal Footer */}
         <div className="flex items-center justify-between pt-4 border-t border-slate-800 mt-auto">
           <button
-            onClick={handleDelete}
+            type="button"
+            onClick={handleDeleteClick}
             disabled={isDeleting}
-            className="flex items-center space-x-1.5 text-xs text-rose-400 hover:text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-500/10 transition-colors"
+            className="flex items-center space-x-1.5 text-xs text-rose-400 hover:text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-500/10 transition-colors cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
             <span>Delete Task</span>
@@ -258,21 +286,32 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
           <div className="flex space-x-3">
             <button
+              type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white rounded-xl hover:bg-slate-800"
+              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
             >
               Cancel
             </button>
             <button
+              type="button"
               onClick={handleSave}
               disabled={isUpdating}
-              className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all"
+              className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
             >
               {isUpdating ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>
       </motion.div>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteConfirmOpen}
+        title="Are you want to delete?"
+        itemName={title || task.title}
+        isLoading={isDeleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { Comment } from "../models/Comment";
 import { Notification } from "../models/Notification";
 import { ITask, Task } from "../models/Task";
 import { ActivityService } from "../services/activity.service";
+import { NotificationService } from "../services/notification.service";
 import { TaskService } from "../services/task.service";
 import { io } from "../sockets";
 import { ApiError } from "../utils/ApiError";
@@ -172,6 +173,34 @@ export const createTask = asyncHandler(async (req: Request, res: Response) => {
     opId,
   });
 
+  const targetCol = board.columns.find((c) => String(c._id) === columnId);
+  const targetColName = targetCol ? targetCol.name : "board";
+
+  await NotificationService.send({
+    recipientId: req.user!._id,
+    senderId: req.user!._id,
+    type: "TASK_CREATED",
+    title: "Task Created",
+    message: `Created task "${task.title}" in ${targetColName}`,
+    boardId: board._id,
+    taskId: task._id,
+  });
+
+  const otherMemberIds = [board.owner, ...board.members]
+    .map((m) => String((m as any)._id || m))
+    .filter((id) => id !== uid(req));
+
+  if (otherMemberIds.length > 0) {
+    await NotificationService.sendToMany(otherMemberIds, {
+      senderId: req.user!._id,
+      type: "TASK_CREATED",
+      title: "New Task Added",
+      message: `${req.user!.name} created task "${task.title}" in ${targetColName}`,
+      boardId: board._id,
+      taskId: task._id,
+    });
+  }
+
   const response = new ApiResponse(201, "Task created", task);
   if (opId) {
     idempotencyStore.set(opId, 201, response);
@@ -266,6 +295,17 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
     version: task.version,
   });
 
+  const changesDesc = changedFields.length > 0 ? changedFields.join(", ") : "details";
+  await NotificationService.send({
+    recipientId: req.user!._id,
+    senderId: req.user!._id,
+    type: "TASK_UPDATED",
+    title: "Task Updated",
+    message: `Updated task "${task.title}" (${changesDesc})`,
+    boardId: task.board,
+    taskId: task._id,
+  });
+
   const response = new ApiResponse(200, "Task updated", task);
   if (opId) {
     idempotencyStore.set(opId, 200, response);
@@ -341,6 +381,36 @@ export const moveTask = asyncHandler(async (req: Request, res: Response) => {
     version: movedTask.version,
   });
 
+  const fromCol = board.columns.find((c) => String(c._id) === oldColumnId);
+  const toCol = board.columns.find((c) => String(c._id) === columnId);
+  const fromName = fromCol ? fromCol.name : "column";
+  const toName = toCol ? toCol.name : "column";
+
+  await NotificationService.send({
+    recipientId: req.user!._id,
+    senderId: req.user!._id,
+    type: "TASK_MOVED",
+    title: "Task Step Changed",
+    message: `Task "${movedTask.title}" moved from ${fromName} to ${toName}`,
+    boardId: task.board,
+    taskId: movedTask._id,
+  });
+
+  const otherMemberIds = [board.owner, ...board.members]
+    .map((m) => String((m as any)._id || m))
+    .filter((id) => id !== uid(req));
+
+  if (otherMemberIds.length > 0) {
+    await NotificationService.sendToMany(otherMemberIds, {
+      senderId: req.user!._id,
+      type: "TASK_MOVED",
+      title: "Task Step Changed",
+      message: `${req.user!.name} moved task "${movedTask.title}" to ${toName}`,
+      boardId: task.board,
+      taskId: movedTask._id,
+    });
+  }
+
   const response = new ApiResponse(200, "Task moved successfully", movedTask);
   if (opId) {
     idempotencyStore.set(opId, 200, response);
@@ -367,6 +437,8 @@ export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
   if (!board) throw new ApiError(404, "Board not found");
   assertBoardAccess(board, uid(req));
 
+  const deletedTitle = task.title;
+
   await Comment.deleteMany({ task: taskId });
   await Notification.deleteMany({ task: taskId });
   await task.deleteOne();
@@ -375,7 +447,7 @@ export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
     req.user!._id,
     String(task.board),
     "TASK_DELETED",
-    `deleted task "${task.title}"`,
+    `deleted task "${deletedTitle}"`,
     { taskId }
   );
 
@@ -384,6 +456,15 @@ export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
     taskId,
     actorId: uid(req),
     opId,
+  });
+
+  await NotificationService.send({
+    recipientId: req.user!._id,
+    senderId: req.user!._id,
+    type: "TASK_DELETED",
+    title: "Task Deleted",
+    message: `Deleted task "${deletedTitle}"`,
+    boardId: task.board,
   });
 
   const response = new ApiResponse(200, "Task deleted", null);

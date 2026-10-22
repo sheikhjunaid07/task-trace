@@ -96,9 +96,21 @@ exports.getDashboardStats = (0, asyncHandler_1.asyncHandler)(async (req, res) =>
     });
     const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
     const upcomingDeadlines = tasks
-        .filter((t) => t.dueDate && new Date(t.dueDate) >= new Date())
+        .filter((t) => {
+        if (!t.dueDate)
+            return false;
+        const colType = columnTypeMap.get(String(t.columnId));
+        return colType !== "done";
+    })
         .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-        .slice(0, 10);
+        .slice(0, 100)
+        .map((t) => {
+        const obj = typeof t.toObject === "function" ? t.toObject() : t;
+        return {
+            ...obj,
+            status: columnTypeMap.get(String(t.columnId)) || "todo",
+        };
+    });
     const activities = await Activity_1.Activity.find({ board: { $in: boardIds } })
         .populate("user", "name email avatar")
         .populate("board", "name title")

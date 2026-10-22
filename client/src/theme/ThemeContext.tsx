@@ -6,13 +6,18 @@ import {
   type ReactNode,
 } from "react";
 
-export type ThemeId = "obsidian" | "midnight" | "forest" | "rose";
+export type ThemeId = "obsidian" | "midnight" | "forest" | "rose" | "editorial";
 
 export const THEMES: { id: ThemeId; name: string; swatch: string[] }[] = [
   {
     id: "obsidian",
     name: "Obsidian",
     swatch: ["#09090b", "#18181b", "#8b5cf6"],
+  },
+  {
+    id: "editorial",
+    name: "Editorial",
+    swatch: ["#ffffff", "#f5f5f5", "#111111"],
   },
   {
     id: "midnight",

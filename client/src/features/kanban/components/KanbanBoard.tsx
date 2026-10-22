@@ -33,6 +33,7 @@ import {
 } from "../../../api/boardApi";
 import { Plus, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { showToast } from "../../../components/ToastNotification";
 import type { TypingUser, DraggingUser } from "../../../sockets/useSocketEvents";
 
 interface KanbanBoardProps {
@@ -258,6 +259,12 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         columnId: targetColumnId,
         position: targetPosition,
       }).unwrap();
+      const destCol = columns.find((c) => c._id === targetColumnId);
+      showToast({
+        type: 'TASK_MOVED',
+        title: 'Task Moved',
+        message: `Task moved to ${destCol?.name || 'new column'}`,
+      });
     } catch (err) {
       console.error("Failed to move task:", err);
     }
@@ -269,6 +276,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
     try {
       await addColumn({ boardId, name: newColumnName.trim() }).unwrap();
+      showToast({
+        type: 'TASK_CREATED',
+        title: 'Column Added',
+        message: `Column "${newColumnName.trim()}" created`,
+      });
       setNewColumnName("");
       setIsAddingColumnForm(false);
     } catch (err) {

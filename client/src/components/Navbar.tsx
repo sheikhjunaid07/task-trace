@@ -13,7 +13,6 @@ import {
   Plus,
 } from 'lucide-react';
 import ThemeSwitcher from '../theme/ThemeSwitcher';
-import { HeaderNotifications } from './HeaderNotifications';
 
 export const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -55,14 +54,14 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="h-16 glass-panel border-x-0 border-t-0 border-b border-edge sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between text-white select-none">
+    <nav className="h-16 glass-panel border-x-0 border-t-0 border-b border-edge sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between text-ink select-none">
       {/* Left: Brand + Dynamic Project Selector */}
       <div className="flex items-center space-x-3 sm:space-x-5">
         <Link to="/dashboard" className="flex items-center space-x-2.5 group">
           <div className="brand-mark w-9 h-9">
             <Kanban className="w-5 h-5 text-white" />
           </div>
-          <span className="font-black text-xl tracking-tight text-white">
+          <span className="font-black text-xl tracking-tight text-ink">
             TaskTrace
           </span>
         </Link>
@@ -74,12 +73,12 @@ export const Navbar: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="flex items-center space-x-2 px-3 py-1.5 rounded-xl border border-white/10 bg-surface/50 hover:bg-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-xl border border-edge bg-surface/50 hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] text-xs font-semibold text-ink transition-colors cursor-pointer"
                 title="Select Project"
               >
-                <Building2 className="w-3.5 h-3.5 text-slate-300" />
+                <Building2 className="w-3.5 h-3.5 text-mute" />
                 <span className="max-w-[140px] truncate">{currentProjectName}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-300" />
+                <ChevronDown className="w-3.5 h-3.5 text-mute" />
               </button>
 
               {/* Role Badge */}
@@ -159,15 +158,12 @@ export const Navbar: React.FC = () => {
 
         {isAuthenticated && user ? (
           <div className="flex items-center space-x-2 sm:space-x-3 ml-1 sm:ml-2">
-            {/* Header Notifications */}
-            <HeaderNotifications />
-
             {/* User Profile Chip */}
-            <div className="flex items-center space-x-2.5 px-3 py-1.5 rounded-full glass-panel border border-white/10">
+            <div className="flex items-center space-x-2.5 px-3 py-1.5 rounded-full glass-panel border border-edge">
               <div className="avatar w-7 h-7 text-xs font-bold text-white bg-accent shadow-sm flex items-center justify-center rounded-full">
                 {user.name ? user.name[0].toUpperCase() : 'U'}
               </div>
-              <span className="text-xs sm:text-sm font-semibold text-white max-w-[120px] truncate hidden sm:inline">
+              <span className="text-xs sm:text-sm font-semibold text-ink max-w-[120px] truncate hidden sm:inline">
                 {user.name}
               </span>
             </div>

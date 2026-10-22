@@ -68,10 +68,10 @@ function DesktopNode({
         )}
       </motion.div>
       <div className="mt-5 text-center">
-        <p className="text-[15px] font-bold tracking-tight text-white">
+        <p className="text-[15px] font-bold tracking-tight text-ink">
           {stage.title}
         </p>
-        <p className="mt-1 text-[11.5px] font-medium text-white/45">
+        <p className="mt-1 text-[11.5px] font-medium text-mute">
           {stage.caption}
         </p>
       </div>
@@ -83,7 +83,7 @@ function Chevron({ x, progress }: { x: number; progress: MotionValue<number> }) 
   const opacity = useTransform(progress, [x - 0.02, x], [0, 1]);
   return (
     <motion.span style={{ left: `${x * 100}%`, opacity }} className="absolute top-7 -translate-x-1/2">
-      <ChevronRight className="h-4 w-4 text-white/60" />
+      <ChevronRight className="h-4 w-4 text-mute" />
     </motion.span>
   );
 }
@@ -161,7 +161,7 @@ export function WorkflowSection() {
       id="workflow"
       ref={ref}
       className="relative overflow-hidden py-28 lg:py-36"
-      style={{ background: 'color-mix(in srgb, #05050a 88%, var(--bg))' }}
+      style={{ background: 'color-mix(in srgb, var(--surface) 88%, var(--bg))' }}
     >
       {/* cinematic backdrop */}
       <div
@@ -212,8 +212,8 @@ export function WorkflowSection() {
                       <s.icon className="h-6 w-6" style={{ color: 'var(--accent)' }} />
                     </motion.div>
                     <div className="text-center">
-                      <p className="text-[15px] font-bold tracking-tight text-white">{s.title}</p>
-                      <p className="mt-1 text-[11.5px] font-medium text-white/45">{s.caption}</p>
+                      <p className="text-[15px] font-bold tracking-tight text-ink">{s.title}</p>
+                      <p className="mt-1 text-[11.5px] font-medium text-mute">{s.caption}</p>
                     </div>
                   </div>
                 </Reveal>
@@ -226,7 +226,7 @@ export function WorkflowSection() {
                     className="-my-6 flex justify-center"
                   >
                     <ArrowDown
-                      className="h-4 w-4 text-white/40"
+                      className="h-4 w-4 text-mute"
                       style={{ animation: 'lp-float 2.4s ease-in-out infinite' }}
                     />
                   </motion.span>

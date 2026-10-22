@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useGetBoardsQuery, useCreateBoardMutation } from '../../../api/boardApi';
 import { Plus, LayoutGrid, Users, Calendar, ArrowRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { showToast } from '../../../components/ToastNotification';
 import type { Board } from '../../../types';
 
 export const BoardsListPage: React.FC = () => {
@@ -21,6 +22,11 @@ export const BoardsListPage: React.FC = () => {
 
     try {
       await createBoard({ name: title.trim(), description: description.trim() }).unwrap();
+      showToast({
+        type: 'PROJECT_CREATED',
+        title: 'Project Created',
+        message: `Project "${title.trim()}" created successfully`,
+      });
       setTitle('');
       setDescription('');
       setIsModalOpen(false);

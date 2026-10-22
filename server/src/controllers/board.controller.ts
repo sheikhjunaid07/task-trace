@@ -9,6 +9,7 @@ import { Notification } from "../models/Notification";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
 import { ActivityService } from "../services/activity.service";
+import { NotificationService } from "../services/notification.service";
 import { io } from "../sockets";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -59,6 +60,15 @@ export const createBoard = asyncHandler(async (req: Request, res: Response) => {
     `created board "${board.name}"`
   );
 
+  await NotificationService.send({
+    recipientId: req.user!._id,
+    senderId: req.user!._id,
+    type: "PROJECT_CREATED",
+    title: "Project Created",
+    message: `You created project "${board.name}"`,
+    boardId: board._id,
+  });
+
   res.status(201).json(new ApiResponse(201, "Board created", formatBoardResponse(board)));
 });
 
@@ -106,9 +116,20 @@ export const getDashboardStats = asyncHandler(async (req: Request, res: Response
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const upcomingDeadlines = tasks
-    .filter((t) => t.dueDate && new Date(t.dueDate) >= new Date())
+    .filter((t) => {
+      if (!t.dueDate) return false;
+      const colType = columnTypeMap.get(String(t.columnId));
+      return colType !== "done";
+    })
     .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
-    .slice(0, 10);
+    .slice(0, 100)
+    .map((t) => {
+      const obj = typeof (t as any).toObject === "function" ? (t as any).toObject() : t;
+      return {
+        ...obj,
+        status: columnTypeMap.get(String(t.columnId)) || "todo",
+      };
+    });
 
   const activities = await Activity.find({ board: { $in: boardIds } })
     .populate("user", "name email avatar")
@@ -300,6 +321,15 @@ export const updateBoard = asyncHandler(async (req: Request, res: Response) => {
     `updated board "${board.name}"`
   );
 
+  await NotificationService.send({
+    recipientId: req.user!._id,
+    senderId: req.user!._id,
+    type: "GENERAL",
+    title: "Project Updated",
+    message: `Project updated to "${board.name}"`,
+    boardId: board._id,
+  });
+
   res.json(new ApiResponse(200, "Board updated", formatBoardResponse(board)));
 });
 
@@ -312,6 +342,9 @@ export const deleteBoard = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(403, "Only the board owner can delete this board");
   }
 
+  const deletedBoardName = board.name;
+  const boardMemberIds = [board.owner, ...board.members].map((m) => String((m as any)._id || m));
+
   const taskIds = await Task.find({ board: boardId }).select("_id");
   await Comment.deleteMany({ task: { $in: taskIds } });
   await Task.deleteMany({ board: boardId });
@@ -321,6 +354,13 @@ export const deleteBoard = asyncHandler(async (req: Request, res: Response) => {
   await board.deleteOne();
 
   io.to(`board:${boardId}`).emit("board:deleted", { boardId });
+
+  await NotificationService.sendToMany(boardMemberIds, {
+    senderId: req.user!._id,
+    type: "PROJECT_DELETED",
+    title: "Project Deleted",
+    message: `Project "${deletedBoardName}" was deleted`,
+  });
 
   res.json(new ApiResponse(200, "Board deleted", null));
 });

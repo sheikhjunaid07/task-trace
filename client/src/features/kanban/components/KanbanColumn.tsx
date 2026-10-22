@@ -9,6 +9,7 @@ import { useRenameColumnMutation, useRemoveColumnMutation } from '../../../api/b
 import { Plus, X, GripVertical, Edit2, Trash2, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { columnColor } from '../../../utils/columnTheming';
+import { showToast } from '../../../components/ToastNotification';
 import type { TypingUser, DraggingUser } from '../../../sockets/useSocketEvents';
 
 interface KanbanColumnProps {
@@ -68,6 +69,11 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
         columnId: column._id,
         title: newTitle.trim(),
       }).unwrap();
+      showToast({
+        type: 'TASK_CREATED',
+        title: 'Task Added',
+        message: `Task "${newTitle.trim()}" added to ${column.name}`,
+      });
       setNewTitle('');
       setIsAdding(false);
     } catch (err) {
@@ -87,6 +93,11 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
         columnId: column._id,
         name: columnName.trim(),
       }).unwrap();
+      showToast({
+        type: 'TASK_UPDATED',
+        title: 'Column Renamed',
+        message: `Column renamed to "${columnName.trim()}"`,
+      });
       setIsEditingTitle(false);
     } catch (err) {
       console.error('Failed to rename column', err);
@@ -97,6 +108,11 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
     if (confirm(`Delete column "${column.name}" and all its tasks?`)) {
       try {
         await removeColumn({ boardId, columnId: column._id }).unwrap();
+        showToast({
+          type: 'TASK_DELETED',
+          title: 'Column Deleted',
+          message: `Column "${column.name}" was deleted`,
+        });
       } catch (err) {
         console.error('Failed to delete column', err);
       }
@@ -147,7 +163,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
           ) : (
             <h3
               onDoubleClick={() => setIsEditingTitle(true)}
-              className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white truncate cursor-pointer hover:text-purple-300 transition-colors"
+              className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-ink truncate cursor-pointer hover:text-accent transition-colors"
               title="Double click to rename"
             >
               {column.name}
@@ -159,14 +175,14 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
 
         <div className="flex items-center space-x-1">
           {/* Column Drag Handle */}
-          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 text-slate-300 hover:text-white">
-            <GripVertical className="column-grip w-4 h-4 text-slate-300" />
+          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 text-mute hover:text-ink">
+            <GripVertical className="column-grip w-4 h-4 text-mute" />
           </div>
 
           <button
             type="button"
             onClick={() => setIsEditingTitle(!isEditingTitle)}
-            className="icon-btn w-7 h-7 text-slate-300 hover:text-white"
+            className="icon-btn w-7 h-7 text-mute hover:text-ink"
             title="Rename Column"
           >
             <Edit2 className="w-3.5 h-3.5" />

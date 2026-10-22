@@ -10,7 +10,6 @@ import {
   FolderKanban,
   Clock,
   TrendingUp,
-  Calendar,
   Activity,
   Plus,
   ArrowRight,
@@ -20,6 +19,9 @@ import {
   LayoutGrid,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import { UpcomingDeadlines } from '../components/UpcomingDeadlines';
+import { showToast } from '../../../components/ToastNotification';
 
 export const DashboardPage: React.FC = () => {
   const currentUser = useAppSelector((state) => state.auth.user);
@@ -44,15 +46,6 @@ export const DashboardPage: React.FC = () => {
         ? (fallbackBoards[0].name || fallbackBoards[0].title)
         : (currentUser?.name ? `${currentUser.name}'s Workspace` : 'Project Workspace'));
 
-  const activeProjectsCount = serverStats?.activeProjects ?? fallbackBoards.length;
-  const totalTasksCount = serverStats?.totalTasks ?? 0;
-  const completionRate = serverStats?.completionRate ?? 0;
-  const todoTasksCount = serverStats?.todoTasks ?? 0;
-  const inProgressTasksCount = serverStats?.inProgressTasks ?? 0;
-  const completedTasksCount = serverStats?.completedTasks ?? 0;
-
-  const upcomingDeadlines = serverStats?.upcomingDeadlines || [];
-  const recentActivities = serverStats?.recentActivities || [];
   const projectsList = serverStats?.projects || fallbackBoards.map((b) => ({
     ...b,
     tasksCount: 0,
@@ -61,6 +54,30 @@ export const DashboardPage: React.FC = () => {
     todoCount: 0,
     completionRate: 0,
   }));
+
+  const currentProjectStats = selectedProjectId
+    ? projectsList.find((p) => p._id === selectedProjectId)
+    : null;
+
+  const activeProjectsCount = serverStats?.activeProjects ?? fallbackBoards.length;
+  const totalTasksCount = currentProjectStats
+    ? currentProjectStats.tasksCount
+    : (serverStats?.totalTasks ?? 0);
+  const completionRate = currentProjectStats
+    ? currentProjectStats.completionRate
+    : (serverStats?.completionRate ?? 0);
+  const todoTasksCount = currentProjectStats
+    ? currentProjectStats.todoCount
+    : (serverStats?.todoTasks ?? 0);
+  const inProgressTasksCount = currentProjectStats
+    ? currentProjectStats.progressCount
+    : (serverStats?.inProgressTasks ?? 0);
+  const completedTasksCount = currentProjectStats
+    ? currentProjectStats.doneCount
+    : (serverStats?.completedTasks ?? 0);
+
+  const upcomingDeadlines = serverStats?.upcomingDeadlines || [];
+  const recentActivities = serverStats?.recentActivities || [];
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +90,11 @@ export const DashboardPage: React.FC = () => {
         title: title.trim(),
         description: description.trim(),
       }).unwrap();
+      showToast({
+        type: 'PROJECT_CREATED',
+        title: 'Project Created',
+        message: `Project "${title.trim()}" created successfully`,
+      });
       setTitle('');
       setDescription('');
       setIsNewProjectModalOpen(false);
@@ -99,7 +121,7 @@ export const DashboardPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-3">
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-ink">
               {displayTitle}
             </h1>
             <span
@@ -112,7 +134,7 @@ export const DashboardPage: React.FC = () => {
               {isUserAdmin ? 'ADMIN' : 'MEMBER'}
             </span>
           </div>
-          <p className="text-sm text-slate-200 font-medium mt-1">
+          <p className="text-sm text-mute font-medium mt-1">
             {currentBoard?.description || 'Collaborative team workspace and project management.'}
           </p>
         </div>
@@ -129,16 +151,16 @@ export const DashboardPage: React.FC = () => {
       {/* ─── Row 1: 3 Metric Cards ─── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Card 1: Active Projects */}
-        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-white/10">
+        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-edge">
           <div>
-            <div className="text-4xl font-extrabold text-white tracking-tight">
+            <div className="text-4xl font-extrabold text-ink tracking-tight">
               {isLoading ? (
                 <div className="h-9 w-12 skeleton rounded" />
               ) : (
                 activeProjectsCount
               )}
             </div>
-            <div className="text-xs font-semibold text-slate-200 mt-1">Active Projects</div>
+            <div className="text-xs font-semibold text-mute mt-1">Active Projects</div>
           </div>
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center border"
@@ -153,16 +175,16 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Card 2: Total Tasks */}
-        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-white/10">
+        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-edge">
           <div>
-            <div className="text-4xl font-extrabold text-white tracking-tight">
+            <div className="text-4xl font-extrabold text-ink tracking-tight">
               {isLoading ? (
                 <div className="h-9 w-12 skeleton rounded" />
               ) : (
                 totalTasksCount
               )}
             </div>
-            <div className="text-xs font-semibold text-slate-200 mt-1">Total Tasks</div>
+            <div className="text-xs font-semibold text-mute mt-1">Total Tasks</div>
           </div>
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center border"
@@ -177,16 +199,16 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Card 3: Completion Rate */}
-        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-white/10">
+        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-edge">
           <div>
-            <div className="text-4xl font-extrabold text-white tracking-tight">
+            <div className="text-4xl font-extrabold text-ink tracking-tight">
               {isLoading ? (
                 <div className="h-9 w-14 skeleton rounded" />
               ) : (
                 `${completionRate}%`
               )}
             </div>
-            <div className="text-xs font-semibold text-slate-200 mt-1">Completion Rate</div>
+            <div className="text-xs font-semibold text-mute mt-1">Completion Rate</div>
           </div>
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center border"
@@ -202,74 +224,38 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* ─── Row 2: Status Breakdown Card ─── */}
-      <div className="glass-panel p-4 sm:p-5 flex flex-wrap items-center justify-around gap-4 text-xs sm:text-sm font-semibold rounded-2xl border border-white/10">
+      <div className="glass-panel p-4 sm:p-5 flex flex-wrap items-center justify-around gap-4 text-xs sm:text-sm font-semibold rounded-2xl border border-edge">
         {/* Pink dot: Tasks To Do */}
         <div className="flex items-center gap-2.5">
           <span className="w-3 h-3 rounded-full bg-pink-500 shadow-sm" />
-          <span className="text-white font-bold">{todoTasksCount}</span>
-          <span className="text-slate-200 font-medium">Tasks To Do</span>
+          <span className="text-ink font-bold">{todoTasksCount}</span>
+          <span className="text-mute font-medium">Tasks To Do</span>
         </div>
 
         {/* Red dot: In Progress */}
         <div className="flex items-center gap-2.5">
           <span className="w-3 h-3 rounded-full bg-rose-500 shadow-sm" />
-          <span className="text-white font-bold">{inProgressTasksCount}</span>
-          <span className="text-slate-200 font-medium">In Progress</span>
+          <span className="text-ink font-bold">{inProgressTasksCount}</span>
+          <span className="text-mute font-medium">In Progress</span>
         </div>
 
         {/* Orange dot: Completed */}
         <div className="flex items-center gap-2.5">
           <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm" />
-          <span className="text-white font-bold">{completedTasksCount}</span>
-          <span className="text-slate-200 font-medium">Completed</span>
+          <span className="text-ink font-bold">{completedTasksCount}</span>
+          <span className="text-mute font-medium">Completed</span>
         </div>
       </div>
 
       {/* ─── Row 3: Upcoming Deadlines & Workspace Activity Feed ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Card: Upcoming Deadlines */}
-        <div className="glass-card p-6 flex flex-col justify-between border border-white/10">
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2 text-white font-bold text-base">
-                <Calendar className="w-5 h-5 text-purple-400" />
-                <span>Upcoming Deadlines</span>
-              </div>
-              <Link
-                to="/boards"
-                className="text-xs font-bold text-purple-300 hover:text-white hover:underline flex items-center gap-1 transition-colors"
-              >
-                <span>View All Projects</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            {upcomingDeadlines.length === 0 ? (
-              <p className="text-sm text-slate-300 italic py-8 text-center sm:text-left">
-                No upcoming task deadlines found in this workspace.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {upcomingDeadlines.map((task: any) => (
-                  <div
-                    key={task._id}
-                    className="flex items-center justify-between p-3 rounded-xl bg-surface/60 border border-white/10"
-                  >
-                    <div>
-                      <div className="text-sm font-bold text-white">{task.title}</div>
-                      <div className="text-xs font-medium text-slate-300">
-                        {task.board?.name || 'Project'}
-                      </div>
-                    </div>
-                    <span className="text-xs px-2.5 py-1 rounded-lg bg-[color-mix(in_srgb,var(--warning)_18%,transparent)] text-amber-300 border border-[color-mix(in_srgb,var(--warning)_35%,transparent)] font-semibold">
-                      {new Date(task.dueDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <UpcomingDeadlines
+          tasks={upcomingDeadlines}
+          isLoading={isStatsLoading}
+          selectedProjectId={selectedProjectId}
+          selectedProjectName={currentBoard?.name || currentBoard?.title}
+        />
 
         {/* Right Card: Workspace Activity Feed */}
         <div className="glass-card p-6 flex flex-col justify-between border border-white/10">

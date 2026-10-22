@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useGetBoardByIdQuery } from '../../../api/boardApi';
 import { useGetBoardTasksQuery } from '../../../api/taskApi';
-import { useAppSelector } from '../../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../../app/hooks';
+import { setActiveTaskId } from '../boardSlice';
 import { useSocketEvents } from '../../../sockets/useSocketEvents';
 import { BoardHeader } from '../components/BoardHeader';
 import { FilterBar } from '../components/FilterBar';
@@ -16,12 +17,29 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export const BoardPage: React.FC = () => {
   const { boardId } = useParams<{ boardId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const dispatch = useAppDispatch();
 
   const { data: boardData, isLoading: isBoardLoading, error: boardError } = useGetBoardByIdQuery(boardId!);
   const { data: tasksData, isLoading: isTasksLoading } = useGetBoardTasksQuery(boardId!);
 
   const { searchQuery, priorityFilter, assigneeFilter, activeTaskId, isActivityOpen, isAnalyticsOpen } =
     useAppSelector((state) => state.board);
+
+  useEffect(() => {
+    const taskIdParam = searchParams.get('taskId');
+    if (taskIdParam) {
+      dispatch(setActiveTaskId(taskIdParam));
+    }
+  }, [searchParams, dispatch]);
+
+  useEffect(() => {
+    if (!activeTaskId && searchParams.has('taskId')) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('taskId');
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [activeTaskId, searchParams, setSearchParams]);
 
   const currentUser = useAppSelector((state) => state.auth.user);
   const {
