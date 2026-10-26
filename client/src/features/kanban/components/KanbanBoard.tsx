@@ -327,7 +327,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               onSubmit={handleAddColumnSubmit}
-              className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3"
+              className="glass-panel p-4 rounded-2xl border border-white/10 space-y-3"
             >
               <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                 Create New Column
@@ -338,6 +338,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 required
                 value={newColumnName}
                 onChange={(e) => setNewColumnName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setIsAddingColumnForm(false);
+                  }
+                }}
                 placeholder="Column name (e.g. In Review)..."
                 className="input py-2 text-xs"
               />
@@ -346,6 +351,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   type="button"
                   onClick={() => setIsAddingColumnForm(false)}
                   className="icon-btn w-8 h-8"
+                  title="Cancel (Esc)"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -360,8 +366,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             </motion.form>
           ) : (
             <button
+              type="button"
               onClick={() => setIsAddingColumnForm(true)}
-              className="w-full h-14 rounded-2xl border-2 border-dashed border-slate-800/80 hover:border-indigo-500/50 hover:bg-indigo-500/5 text-slate-400 hover:text-indigo-300 font-semibold text-xs transition-all flex items-center justify-center space-x-2"
+              className="w-full h-14 rounded-2xl border-2 border-dashed border-white/10 hover:border-accent/40 hover:bg-white/[0.04] text-slate-400 hover:text-white font-semibold text-xs transition-all flex items-center justify-center space-x-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add Column</span>

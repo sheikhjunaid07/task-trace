@@ -15,6 +15,31 @@ export const updateBoardSchema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
   title: z.string().trim().min(1).max(100).optional(),
   description: z.string().trim().max(500).optional(),
+  icon: z.string().optional(),
+  color: z.string().optional(),
+  avatarUrl: z.string().nullable().optional(),
+  visibility: z.enum(["public", "private"]).optional(),
+  labels: z
+    .array(
+      z.object({
+        _id: z.string().optional(),
+        name: z.string().trim().min(1).max(40),
+        color: z.string().trim().min(1).max(20),
+      })
+    )
+    .optional(),
+}).passthrough();
+
+export const updateMemberRoleSchema = z.object({
+  role: z.enum(["admin", "member", "viewer"]),
+});
+
+export const transferOwnershipSchema = z.object({
+  newOwnerId: z.string().min(1, "New owner user ID is required"),
+});
+
+export const setWipLimitSchema = z.object({
+  wipLimit: z.number().nullable().optional(),
 });
 
 export const addColumnSchema = z.object({

@@ -258,41 +258,41 @@ export const DashboardPage: React.FC = () => {
         />
 
         {/* Right Card: Workspace Activity Feed */}
-        <div className="glass-card p-6 flex flex-col justify-between border border-white/10">
+        <div className="glass-card p-6 flex flex-col justify-between border border-edge shadow-md rounded-2xl">
           <div>
-            <div className="flex items-center gap-2 text-white font-bold text-base mb-6">
-              <Activity className="w-5 h-5 text-rose-400" />
+            <div className="flex items-center gap-2 text-ink font-bold text-base mb-6">
+              <Activity className="w-5 h-5 text-rose-500" />
               <span>Workspace Activity Feed</span>
             </div>
 
             <div className="space-y-4">
               {recentActivities.length === 0 ? (
                 <div className="flex items-start gap-3.5">
-                  <div className="avatar w-8 h-8 rounded-full bg-accent text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                  <div className="avatar w-8 h-8 rounded-full bg-accent text-on-accent font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                     {userInitial}
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm text-white leading-snug">
+                    <p className="text-xs sm:text-sm text-ink leading-snug">
                       <span className="font-bold">{userName}</span> active in workspace
                     </p>
-                    <p className="text-[11px] text-slate-300 font-medium mt-1">Ready for collaboration</p>
+                    <p className="text-[11px] text-mute font-medium mt-1">Ready for collaboration</p>
                   </div>
                 </div>
               ) : (
                 recentActivities.slice(0, 5).map((act: any) => (
                   <div key={act._id} className="flex items-start gap-3.5 pt-3 first:pt-0 border-t border-edge first:border-t-0">
-                    <div className="avatar w-8 h-8 rounded-full bg-accent text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                    <div className="avatar w-8 h-8 rounded-full bg-accent text-on-accent font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                       {act.user?.name ? act.user.name[0].toUpperCase() : 'U'}
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm text-white leading-snug">
+                      <p className="text-xs sm:text-sm text-ink leading-snug">
                         <span className="font-bold">{act.user?.name || 'User'}</span>{' '}
                         {act.message || act.action || 'performed an activity'}
                         {act.board?.name && (
-                          <span className="text-slate-300"> in "{act.board.name}"</span>
+                          <span className="text-mute"> in "{act.board.name}"</span>
                         )}
                       </p>
-                      <p className="text-[11px] text-slate-300 font-medium mt-1">
+                      <p className="text-[11px] text-mute font-medium mt-1">
                         {new Date(act.createdAt).toLocaleString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -313,30 +313,30 @@ export const DashboardPage: React.FC = () => {
       <div className="space-y-5 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-edge pb-4">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FolderKanban className="w-5 h-5 text-purple-400" />
+            <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+              <FolderKanban className="w-5 h-5 text-accent" />
               <span>All Project Details</span>
             </h2>
-            <p className="text-xs font-medium text-slate-200 mt-0.5">
+            <p className="text-xs font-medium text-mute mt-0.5">
               Comprehensive overview of active Kanban projects in your workspace
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2.5 py-1 rounded-lg glass-panel text-white border border-white/15">
+            <span className="text-xs font-bold px-2.5 py-1 rounded-lg glass-panel text-ink border border-edge">
               {projectsList.length} {projectsList.length === 1 ? 'Project' : 'Projects'}
             </span>
           </div>
         </div>
 
         {projectsList.length === 0 ? (
-          <div className="glass-card p-10 text-center space-y-4 border border-white/10">
+          <div className="glass-card p-10 text-center space-y-4 border border-edge">
             <div className="brand-mark w-14 h-14 mx-auto flex items-center justify-center">
               <LayoutGrid className="w-7 h-7" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">No Projects Found</h3>
-              <p className="text-xs font-medium text-slate-200 max-w-sm mx-auto mt-1">
+              <h3 className="text-lg font-bold text-ink">No Projects Found</h3>
+              <p className="text-xs font-medium text-mute max-w-sm mx-auto mt-1">
                 You haven't created any Kanban projects yet. Start by creating your first project now!
               </p>
             </div>
@@ -363,24 +363,24 @@ export const DashboardPage: React.FC = () => {
               return (
                 <div
                   key={project._id}
-                  className="glass-card card-lift p-5 flex flex-col justify-between transition-all group relative overflow-hidden border border-white/10"
+                  className="glass-card card-lift p-5 flex flex-col justify-between transition-all group relative overflow-hidden border border-edge"
                 >
                   <div className="space-y-4">
                     {/* Project Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors truncate">
+                        <h3 className="text-base font-bold text-ink group-hover:text-accent transition-colors truncate">
                           {pTitle}
                         </h3>
-                        <p className="text-xs font-medium text-slate-200 line-clamp-2 mt-1 leading-relaxed">
+                        <p className="text-xs font-medium text-mute line-clamp-2 mt-1 leading-relaxed">
                           {pDesc}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
-                        <span className="px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] text-emerald-300 border border-[color-mix(in_srgb,var(--success)_35%,transparent)] text-[10px] font-bold uppercase tracking-wider">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">
                           Active
                         </span>
-                        <span className="text-[10px] font-semibold text-slate-300">
+                        <span className="text-[10px] font-semibold text-mute">
                           {pTasksCount} {pTasksCount === 1 ? 'task' : 'tasks'}
                         </span>
                       </div>
@@ -389,8 +389,8 @@ export const DashboardPage: React.FC = () => {
                     {/* Progress Bar */}
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-200 font-medium">Progress</span>
-                        <span className="font-bold text-white">{pRate}%</span>
+                        <span className="text-mute font-medium">Progress</span>
+                        <span className="font-bold text-ink">{pRate}%</span>
                       </div>
                       <div className="w-full h-2 rounded-full bg-surface overflow-hidden border border-edge">
                         <div
@@ -405,31 +405,31 @@ export const DashboardPage: React.FC = () => {
 
                     {/* Tasks Breakdown Pills */}
                     <div className="grid grid-cols-3 gap-2 text-center text-xs pt-1">
-                      <div className="p-2 rounded-xl bg-surface/80 border border-white/10">
-                        <span className="block font-bold text-pink-400">{pTodoCount}</span>
-                        <span className="text-[10px] font-semibold text-slate-200">To Do</span>
+                      <div className="p-2 rounded-xl bg-surface/80 border border-edge">
+                        <span className="block font-bold text-pink-500">{pTodoCount}</span>
+                        <span className="text-[10px] font-semibold text-mute">To Do</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-surface/80 border border-white/10">
-                        <span className="block font-bold text-rose-400">{pProgressCount}</span>
-                        <span className="text-[10px] font-semibold text-slate-200">In Progress</span>
+                      <div className="p-2 rounded-xl bg-surface/80 border border-edge">
+                        <span className="block font-bold text-rose-500">{pProgressCount}</span>
+                        <span className="text-[10px] font-semibold text-mute">In Progress</span>
                       </div>
-                      <div className="p-2 rounded-xl bg-surface/80 border border-white/10">
-                        <span className="block font-bold text-amber-400">{pDoneCount}</span>
-                        <span className="text-[10px] font-semibold text-slate-200">Done</span>
+                      <div className="p-2 rounded-xl bg-surface/80 border border-edge">
+                        <span className="block font-bold text-amber-500">{pDoneCount}</span>
+                        <span className="text-[10px] font-semibold text-mute">Done</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Project Footer Actions */}
                   <div className="pt-4 mt-4 border-t border-edge flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-1.5 text-slate-200 font-medium">
-                      <Users className="w-3.5 h-3.5 text-purple-300" />
+                    <div className="flex items-center space-x-1.5 text-mute font-medium">
+                      <Users className="w-3.5 h-3.5 text-accent" />
                       <span>{membersCount} {membersCount === 1 ? 'member' : 'members'}</span>
                     </div>
 
                     <Link
                       to={`/boards/${project._id}`}
-                      className="inline-flex items-center gap-1.5 font-bold text-purple-300 hover:text-white hover:underline transition-all group-hover:translate-x-0.5 transition-transform"
+                      className="inline-flex items-center gap-1.5 font-bold text-accent hover:underline transition-all group-hover:translate-x-0.5 transition-transform"
                     >
                       <span>Open Board</span>
                       <ArrowRight className="w-3.5 h-3.5" />

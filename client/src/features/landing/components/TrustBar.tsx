@@ -49,7 +49,7 @@ export function TrustBar() {
                 {it.value}
                 {it.live && <Radio className="h-5 w-5" style={{ color: 'var(--success)' }} />}
               </span>
-              <span className="text-[13px] font-medium text-faint">{it.label}</span>
+              <span className="text-[13px] font-medium text-mute">{it.label}</span>
             </motion.div>
           ))}
         </motion.div>

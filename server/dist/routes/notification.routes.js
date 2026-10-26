@@ -41,5 +41,7 @@ router.use(auth_middleware_1.authenticate);
 router.get("/", notificationController.getUserNotifications);
 router.patch("/read-all", notificationController.markAllAsRead);
 router.patch("/:notificationId/read", notificationController.markAsRead);
+router.delete("/clear-all", notificationController.clearAllNotifications);
+router.delete("/:notificationId", notificationController.deleteNotification);
 exports.default = router;
 //# sourceMappingURL=notification.routes.js.map

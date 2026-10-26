@@ -12,7 +12,21 @@ export interface Column {
   id?: string;
   name: string;
   color?: string;
-  position: number;
+  position?: number;
+  order?: number;
+  wipLimit?: number | null;
+  isArchived?: boolean;
+}
+
+export interface BoardLabel {
+  _id?: string;
+  name: string;
+  color: string;
+}
+
+export interface MemberRole {
+  user: User | string;
+  role: 'admin' | 'member' | 'viewer';
 }
 
 export interface BoardMember {
@@ -28,10 +42,17 @@ export interface Board {
   title: string;
   name?: string;
   description?: string;
+  icon?: string;
+  color?: string;
+  avatarUrl?: string;
+  visibility?: 'public' | 'private';
   owner: User | string;
   members: User[];
+  memberRoles?: MemberRole[];
+  labels?: BoardLabel[];
   columns: Column[];
   inviteCode?: string;
+  isArchived?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -51,6 +72,7 @@ export type NotificationType =
   | 'BOARD_INVITATION'
   | 'TASK_MENTION'
   | 'PROJECT_CREATED'
+  | 'PROJECT_UPDATED'
   | 'TASK_CREATED'
   | 'TASK_MOVED'
   | 'TASK_UPDATED'
@@ -88,6 +110,7 @@ export interface Task {
   assignees?: User[];
   createdBy: User | string;
   commentCount?: number;
+  isArchived?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

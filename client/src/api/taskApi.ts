@@ -185,6 +185,22 @@ export const taskApi = baseApi.injectEndpoints({
         { type: 'Notification', id: 'LIST' },
       ],
     }),
+    archiveTask: builder.mutation<
+      SingleTaskResponse,
+      { taskId: string; boardId: string; isArchived?: boolean }
+    >({
+      query: ({ taskId, isArchived = true }) => ({
+        url: `/tasks/${taskId}/archive`,
+        method: 'PATCH',
+        body: { isArchived },
+      }),
+      invalidatesTags: (_result, _error, { taskId, boardId }) => [
+        { type: 'Task', id: taskId },
+        { type: 'Task', id: `BOARD_${boardId}` },
+        { type: 'Task', id: 'LIST' },
+        { type: 'Board', id: `ARCHIVES_${boardId}` },
+      ],
+    }),
   }),
 });
 
@@ -194,4 +210,5 @@ export const {
   useUpdateTaskMutation,
   useMoveTaskMutation,
   useDeleteTaskMutation,
+  useArchiveTaskMutation,
 } = taskApi;

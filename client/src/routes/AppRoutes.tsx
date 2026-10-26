@@ -9,7 +9,9 @@ import { JoinBoardPage } from '../features/board/pages/JoinBoardPage';
 import { LandingPage } from '../features/landing/LandingPage';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { TeamMembersPage } from '../features/team/pages/TeamMembersPage';
+import { ProjectSettingsPage } from '../features/settings/pages/ProjectSettingsPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import { NotFoundPage } from '../features/notFound/NotFoundPage';
 
 function JoinRoute() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
@@ -53,11 +55,14 @@ export const AppRoutes: React.FC = () => {
         <Route path="/boards" element={<BoardsListPage />} />
         <Route path="/projects" element={<BoardsListPage />} />
         <Route path="/boards/:boardId" element={<BoardPage />} />
+        <Route path="/boards/:boardId/settings" element={<ProjectSettingsPage />} />
+        <Route path="/settings" element={<ProjectSettingsPage />} />
         <Route path="/team" element={<TeamMembersPage />} />
         <Route path="/members" element={<TeamMembersPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/404" element={<NotFoundPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

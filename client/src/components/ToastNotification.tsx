@@ -54,6 +54,7 @@ const SingleToastCard: React.FC<SingleToastProps> = ({ toast, onDismiss }) => {
   const getToastIcon = (type: NotificationType) => {
     switch (type) {
       case "PROJECT_CREATED":
+      case "PROJECT_UPDATED":
         return <FolderKanban className="w-4 h-4 text-purple-400" />;
       case "TASK_CREATED":
         return <CheckSquare className="w-4 h-4 text-emerald-400" />;

@@ -43,13 +43,18 @@ export const createBoard = asyncHandler(async (req: Request, res: Response) => {
   const board = await Board.create({
     name: boardName,
     description: req.body.description,
+    icon: req.body.icon || "🚀",
+    color: req.body.color || "#8b5cf6",
+    avatarUrl: req.body.avatarUrl || null,
+    visibility: req.body.visibility || "private",
     owner: req.user!._id,
     inviteCode: generateInviteCode(),
+    memberRoles: [{ user: req.user!._id, role: "admin" }],
     columns: [
-      { name: "To Do", order: 0 },
-      { name: "In Progress", order: 1 },
-      { name: "Review", order: 2 },
-      { name: "Done", order: 3 },
+      { name: "To Do", order: 0, wipLimit: null },
+      { name: "In Progress", order: 1, wipLimit: 5 },
+      { name: "Review", order: 2, wipLimit: 3 },
+      { name: "Done", order: 3, wipLimit: null },
     ],
   } as Partial<IBoard>);
 
@@ -274,14 +279,50 @@ export const getBoardById = asyncHandler(async (req: Request, res: Response) => 
 
   const board = await Board.findById(boardId)
     .populate("owner", "name email avatar")
-    .populate("members", "name email avatar");
+    .populate("members", "name email avatar")
+    .populate("memberRoles.user", "name email avatar");
   if (!board) throw new ApiError(404, "Board not found");
 
   assertBoardAccess(board, uid(req));
 
+  let needsSave = false;
+
   if (!board.inviteCode) {
     board.inviteCode = generateInviteCode();
-    await board.save();
+    needsSave = true;
+  }
+
+  // Ensure default labels if none
+  if (!board.labels || board.labels.length === 0) {
+    board.labels = [
+      { name: "Bug", color: "#ef4444" },
+      { name: "Feature", color: "#3b82f6" },
+      { name: "Design", color: "#8b5cf6" },
+      { name: "DevOps", color: "#10b981" },
+      { name: "Documentation", color: "#f59e0b" },
+    ] as any;
+    needsSave = true;
+  }
+
+  if (!board.icon) {
+    board.icon = "🚀";
+    needsSave = true;
+  }
+  if (!board.color) {
+    board.color = "#8b5cf6";
+    needsSave = true;
+  }
+  if (!board.visibility) {
+    board.visibility = "private";
+    needsSave = true;
+  }
+
+  // Ensure owner is admin in memberRoles
+  if (!board.memberRoles) board.memberRoles = [];
+  const ownerId = idOf(board.owner);
+  if (!board.memberRoles.some((mr) => idOf(mr.user) === ownerId)) {
+    board.memberRoles.push({ user: new Types.ObjectId(ownerId), role: "admin" });
+    needsSave = true;
   }
 
   // Ensure Review column exists on board if it has standard columns
@@ -293,8 +334,12 @@ export const getBoardById = asyncHandler(async (req: Request, res: Response) => 
       board.columns.forEach((c, idx) => {
         c.order = idx;
       });
-      await board.save();
+      needsSave = true;
     }
+  }
+
+  if (needsSave) {
+    await board.save();
   }
 
   res.json(new ApiResponse(200, "Board fetched", formatBoardResponse(board)));
@@ -308,18 +353,44 @@ export const updateBoard = asyncHandler(async (req: Request, res: Response) => {
   assertBoardAccess(board, uid(req));
 
   const newName = req.body.name || req.body.title;
-  if (typeof newName === "string") board.name = newName;
+  if (typeof newName === "string" && newName.trim()) board.name = newName.trim();
   if (typeof req.body.description === "string") {
     board.description = req.body.description;
   }
+  if (typeof req.body.icon === "string") {
+    board.icon = req.body.icon;
+  }
+  if (typeof req.body.color === "string") {
+    board.color = req.body.color;
+  }
+  if (req.body.avatarUrl !== undefined) {
+    board.avatarUrl = req.body.avatarUrl;
+  }
+  if (req.body.visibility === "public" || req.body.visibility === "private") {
+    board.visibility = req.body.visibility;
+  }
+  if (Array.isArray(req.body.labels)) {
+    board.labels = req.body.labels as any;
+  }
+
   await board.save();
+  await board.populate([
+    { path: "owner", select: "name email avatar" },
+    { path: "members", select: "name email avatar" },
+    { path: "memberRoles.user", select: "name email avatar" },
+  ]);
 
   await ActivityService.log(
     req.user!._id,
     String(board._id),
     "BOARD_UPDATED",
-    `updated board "${board.name}"`
+    `updated settings for board "${board.name}"`
   );
+
+  io.to(`board:${boardId}`).emit("board:updated", {
+    boardId,
+    board: formatBoardResponse(board),
+  });
 
   await NotificationService.send({
     recipientId: req.user!._id,
@@ -874,4 +945,261 @@ export const getBoardInvitations = asyncHandler(async (req: Request, res: Respon
     .sort({ createdAt: -1 });
 
   res.json(new ApiResponse(200, "Board invitations fetched", invitations));
+});
+
+/** Update member role / RBAC */
+export const updateMemberRole = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId, userId } = req.params;
+  const { role } = req.body as { role: "admin" | "member" | "viewer" };
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+
+  const currentUserId = uid(req);
+  const isOwner = idOf(board.owner) === currentUserId;
+  const currentMemberRole = board.memberRoles?.find((mr) => idOf(mr.user) === currentUserId);
+  const isAdmin = currentMemberRole?.role === "admin";
+
+  if (!isOwner && !isAdmin) {
+    throw new ApiError(403, "Only board owners or admins can modify member permissions");
+  }
+
+  if (idOf(board.owner) === userId) {
+    throw new ApiError(400, "Cannot change role of the board owner");
+  }
+
+  if (!board.memberRoles) board.memberRoles = [];
+  const existingRole = board.memberRoles.find((mr) => idOf(mr.user) === userId);
+  if (existingRole) {
+    existingRole.role = role;
+  } else {
+    board.memberRoles.push({ user: new Types.ObjectId(userId), role });
+  }
+
+  await board.save();
+
+  await ActivityService.log(
+    req.user!._id,
+    String(board._id),
+    "MEMBER_UPDATED",
+    `updated permission for member to ${role}`,
+    { targetUserId: userId, role }
+  );
+
+  io.to(`board:${boardId}`).emit("board:member-role-updated", {
+    boardId,
+    userId,
+    role,
+  });
+
+  res.json(new ApiResponse(200, "Member role updated successfully", { userId, role }));
+});
+
+/** Transfer board ownership */
+export const transferOwnership = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId } = req.params;
+  const { newOwnerId } = req.body as { newOwnerId: string };
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+  if (idOf(board.owner) !== uid(req)) {
+    throw new ApiError(403, "Only the current owner can transfer ownership of this board");
+  }
+
+  if (newOwnerId === uid(req)) {
+    throw new ApiError(400, "You are already the owner of this board");
+  }
+
+  const isMember = board.members.some((m) => idOf(m) === newOwnerId);
+  if (!isMember) {
+    throw new ApiError(400, "New owner must be an existing member of the board");
+  }
+
+  const previousOwnerId = idOf(board.owner);
+
+  // Set new owner
+  board.owner = new Types.ObjectId(newOwnerId);
+
+  // Ensure previous owner is in members list with 'admin' role
+  if (!board.members.some((m) => idOf(m) === previousOwnerId)) {
+    board.members.push(new Types.ObjectId(previousOwnerId));
+  }
+  if (!board.memberRoles) board.memberRoles = [];
+  const prevOwnerRole = board.memberRoles.find((mr) => idOf(mr.user) === previousOwnerId);
+  if (prevOwnerRole) {
+    prevOwnerRole.role = "admin";
+  } else {
+    board.memberRoles.push({ user: new Types.ObjectId(previousOwnerId), role: "admin" });
+  }
+
+  const newOwnerRole = board.memberRoles.find((mr) => idOf(mr.user) === newOwnerId);
+  if (newOwnerRole) {
+    newOwnerRole.role = "admin";
+  } else {
+    board.memberRoles.push({ user: new Types.ObjectId(newOwnerId), role: "admin" });
+  }
+
+  await board.save();
+  await board.populate([
+    { path: "owner", select: "name email avatar" },
+    { path: "members", select: "name email avatar" },
+    { path: "memberRoles.user", select: "name email avatar" },
+  ]);
+
+  const newOwnerUser = await User.findById(newOwnerId);
+
+  await ActivityService.log(
+    req.user!._id,
+    String(board._id),
+    "BOARD_UPDATED",
+    `transferred board ownership to ${newOwnerUser?.name || "new owner"}`
+  );
+
+  io.to(`board:${boardId}`).emit("board:ownership-transferred", {
+    boardId,
+    newOwnerId,
+    previousOwnerId,
+    board: formatBoardResponse(board),
+  });
+
+  res.json(new ApiResponse(200, "Ownership transferred successfully", formatBoardResponse(board)));
+});
+
+/** Update column WIP limit */
+export const updateColumnWipLimit = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId, columnId } = req.params;
+  const { wipLimit } = req.body as { wipLimit: number | null };
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+  assertBoardAccess(board, uid(req));
+
+  const column = board.columns.find((c) => String(c._id) === columnId);
+  if (!column) throw new ApiError(404, "Column not found");
+
+  column.wipLimit = typeof wipLimit === "number" && wipLimit > 0 ? wipLimit : null;
+  await board.save();
+
+  io.to(`board:${boardId}`).emit("column:updated", {
+    boardId,
+    columnId,
+    wipLimit: column.wipLimit,
+    column,
+  });
+
+  res.json(new ApiResponse(200, "Column WIP limit updated", column));
+});
+
+/** Archive or unarchive column */
+export const archiveColumn = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId, columnId } = req.params;
+  const { isArchived } = req.body as { isArchived: boolean };
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+  assertBoardAccess(board, uid(req));
+
+  const column = board.columns.find((c) => String(c._id) === columnId);
+  if (!column) throw new ApiError(404, "Column not found");
+
+  column.isArchived = isArchived !== false;
+  await board.save();
+
+  io.to(`board:${boardId}`).emit("column:archived", {
+    boardId,
+    columnId,
+    isArchived: column.isArchived,
+  });
+
+  res.json(new ApiResponse(200, column.isArchived ? "Column archived" : "Column restored", column));
+});
+
+/** Get all archives (tasks and columns) for a board */
+export const getBoardArchives = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId } = req.params;
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+  assertBoardAccess(board, uid(req));
+
+  const archivedTasks = await Task.find({ board: boardId, isArchived: true })
+    .populate("assignees", "name email avatar")
+    .sort({ updatedAt: -1 });
+
+  const archivedColumns = board.columns.filter((c) => c.isArchived === true);
+
+  res.json(
+    new ApiResponse(200, "Board archives fetched", {
+      tasks: archivedTasks,
+      columns: archivedColumns,
+    })
+  );
+});
+
+/** Restore archived item (task or column) */
+export const restoreArchivedItem = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId } = req.params;
+  const { type, itemId } = req.body as { type: "task" | "column"; itemId: string };
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+  assertBoardAccess(board, uid(req));
+
+  if (type === "task") {
+    const task = await Task.findOne({ _id: itemId, board: boardId });
+    if (!task) throw new ApiError(404, "Archived task not found");
+    task.isArchived = false;
+
+    // Check if column still exists and is not archived
+    const colExists = board.columns.some((c) => String(c._id) === String(task.columnId) && !c.isArchived);
+    if (!colExists && board.columns.length > 0) {
+      task.columnId = board.columns[0]._id!;
+    }
+    await task.save();
+    await task.populate("assignees", "name email avatar");
+
+    io.to(`board:${boardId}`).emit("task:restored", { boardId, task });
+    return res.json(new ApiResponse(200, "Task restored successfully", task));
+  } else if (type === "column") {
+    const column = board.columns.find((c) => String(c._id) === itemId);
+    if (!column) throw new ApiError(404, "Column not found");
+    column.isArchived = false;
+    await board.save();
+
+    io.to(`board:${boardId}`).emit("column:restored", { boardId, column });
+    return res.json(new ApiResponse(200, "Column restored successfully", column));
+  }
+
+  throw new ApiError(400, "Invalid archive item type");
+});
+
+/** Permanently delete archived item (task or column) */
+export const permanentDeleteArchivedItem = asyncHandler(async (req: Request, res: Response) => {
+  const { boardId } = req.params;
+  const { type, itemId } = req.body as { type: "task" | "column"; itemId: string };
+
+  const board = await Board.findById(boardId);
+  if (!board) throw new ApiError(404, "Board not found");
+  assertBoardAccess(board, uid(req));
+
+  if (type === "task") {
+    const task = await Task.findOne({ _id: itemId, board: boardId });
+    if (!task) throw new ApiError(404, "Task not found");
+    await Comment.deleteMany({ task: itemId });
+    await Notification.deleteMany({ task: itemId });
+    await task.deleteOne();
+
+    return res.json(new ApiResponse(200, "Task permanently deleted", null));
+  } else if (type === "column") {
+    const colIndex = board.columns.findIndex((c) => String(c._id) === itemId);
+    if (colIndex === -1) throw new ApiError(404, "Column not found");
+
+    board.columns.splice(colIndex, 1);
+    await board.save();
+    await Task.deleteMany({ board: boardId, columnId: itemId });
+
+    return res.json(new ApiResponse(200, "Column permanently deleted", null));
+  }
+
+  throw new ApiError(400, "Invalid archive item type");
 });

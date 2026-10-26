@@ -13,6 +13,7 @@ const Notification_1 = require("../models/Notification");
 const Task_1 = require("../models/Task");
 const User_1 = require("../models/User");
 const activity_service_1 = require("../services/activity.service");
+const notification_service_1 = require("../services/notification.service");
 const sockets_1 = require("../sockets");
 const ApiError_1 = require("../utils/ApiError");
 const ApiResponse_1 = require("../utils/ApiResponse");
@@ -51,6 +52,14 @@ exports.createBoard = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
         ],
     });
     await activity_service_1.ActivityService.log(req.user._id, String(board._id), "BOARD_CREATED", `created board "${board.name}"`);
+    await notification_service_1.NotificationService.send({
+        recipientId: req.user._id,
+        senderId: req.user._id,
+        type: "PROJECT_CREATED",
+        title: "Project Created",
+        message: `You created project "${board.name}"`,
+        boardId: board._id,
+    });
     res.status(201).json(new ApiResponse_1.ApiResponse(201, "Board created", formatBoardResponse(board)));
 });
 exports.getDashboardStats = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
@@ -270,6 +279,14 @@ exports.updateBoard = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     }
     await board.save();
     await activity_service_1.ActivityService.log(req.user._id, String(board._id), "BOARD_UPDATED", `updated board "${board.name}"`);
+    await notification_service_1.NotificationService.send({
+        recipientId: req.user._id,
+        senderId: req.user._id,
+        type: "GENERAL",
+        title: "Project Updated",
+        message: `Project updated to "${board.name}"`,
+        boardId: board._id,
+    });
     res.json(new ApiResponse_1.ApiResponse(200, "Board updated", formatBoardResponse(board)));
 });
 exports.deleteBoard = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
@@ -280,6 +297,8 @@ exports.deleteBoard = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     if ((0, idOf_1.idOf)(board.owner) !== uid(req)) {
         throw new ApiError_1.ApiError(403, "Only the board owner can delete this board");
     }
+    const deletedBoardName = board.name;
+    const boardMemberIds = [board.owner, ...board.members].map((m) => String(m._id || m));
     const taskIds = await Task_1.Task.find({ board: boardId }).select("_id");
     await Comment_1.Comment.deleteMany({ task: { $in: taskIds } });
     await Task_1.Task.deleteMany({ board: boardId });
@@ -288,6 +307,12 @@ exports.deleteBoard = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     await Notification_1.Notification.deleteMany({ board: boardId });
     await board.deleteOne();
     sockets_1.io.to(`board:${boardId}`).emit("board:deleted", { boardId });
+    await notification_service_1.NotificationService.sendToMany(boardMemberIds, {
+        senderId: req.user._id,
+        type: "PROJECT_DELETED",
+        title: "Project Deleted",
+        message: `Project "${deletedBoardName}" was deleted`,
+    });
     res.json(new ApiResponse_1.ApiResponse(200, "Board deleted", null));
 });
 exports.addColumn = (0, asyncHandler_1.asyncHandler)(async (req, res) => {

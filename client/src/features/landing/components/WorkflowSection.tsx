@@ -45,9 +45,7 @@ function DesktopNode({
   const shadow = useTransform(
     glow,
     (v) =>
-      `0 0 0 1px rgba(139,92,246,${0.12 + v * 0.4}), 0 0 ${18 + v * 34}px ${
-        4 + v * 10
-      }px rgba(139,92,246,${0.08 + v * 0.22})`
+      `0 0 0 1px color-mix(in srgb, var(--accent) ${Math.round(14 + v * 40)}%, transparent), 0 0 ${Math.round(18 + v * 30)}px ${Math.round(4 + v * 8)}px color-mix(in srgb, var(--glow) ${Math.round(16 + v * 30)}%, transparent)`
   );
 
   return (
@@ -118,10 +116,10 @@ function DesktopLine({ progress }: { progress: MotionValue<number> }) {
           strokeLinecap="round"
           style={{ pathLength: progress }}
         />
-        <defs>
+                <defs>
           <linearGradient id="flowGrad" x1="0" y1="0" x2="100%" y2="0">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="100%" stopColor="#a855f7" />
+            <stop offset="0%" stopColor="var(--accent)" />
+            <stop offset="100%" stopColor="var(--accent-2)" />
           </linearGradient>
         </defs>
       </svg>
@@ -134,12 +132,12 @@ function DesktopLine({ progress }: { progress: MotionValue<number> }) {
         style={{ left: cometX, opacity: cometOpacity }}
         className="absolute top-[26px] -translate-x-1/2"
       >
-        <span className="block h-3 w-3 rounded-full bg-[#a855f7]" />
+        <span className="block h-3 w-3 rounded-full" style={{ backgroundColor: 'var(--accent)' }} />
         <span
           className="absolute inset-0 -z-10 rounded-full"
           style={{
             background:
-              'radial-gradient(circle, rgba(168,85,247,0.55), transparent 70%)',
+              'radial-gradient(circle, var(--glow), transparent 70%)',
             filter: 'blur(6px)',
             transform: 'scale(2.6)',
           }}
@@ -151,16 +149,21 @@ function DesktopLine({ progress }: { progress: MotionValue<number> }) {
 
 export function WorkflowSection() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start 0.78', 'end 0.55'],
-  });
+  const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 1024 : true;
+  const { scrollYProgress } = useScroll(
+    isDesktop
+      ? {
+          target: ref,
+          offset: ['start 0.78', 'end 0.55'],
+        }
+      : undefined
+  );
 
   return (
     <section
       id="workflow"
       ref={ref}
-      className="relative overflow-hidden py-28 lg:py-36"
+      className="relative overflow-hidden py-24 lg:py-32 scroll-mt-24"
       style={{ background: 'color-mix(in srgb, var(--surface) 88%, var(--bg))' }}
     >
       {/* cinematic backdrop */}
@@ -168,7 +171,7 @@ export function WorkflowSection() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(900px 460px at 50% -10%, rgba(139,92,246,0.14), transparent 60%), radial-gradient(700px 380px at 90% 110%, rgba(168,85,247,0.1), transparent 60%), radial-gradient(600px 320px at 5% 90%, rgba(139,92,246,0.07), transparent 60%)',
+            'radial-gradient(900px 460px at 50% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), radial-gradient(700px 380px at 90% 110%, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 60%), radial-gradient(600px 320px at 5% 90%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%)',
         }}
       />
       <div className="lp-noise" />

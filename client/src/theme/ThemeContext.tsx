@@ -17,7 +17,7 @@ export const THEMES: { id: ThemeId; name: string; swatch: string[] }[] = [
   {
     id: "editorial",
     name: "Editorial",
-    swatch: ["#ffffff", "#f5f5f5", "#111111"],
+    swatch: ["#FCFCFC", "#F0F0F2", "#111111"],
   },
   {
     id: "midnight",

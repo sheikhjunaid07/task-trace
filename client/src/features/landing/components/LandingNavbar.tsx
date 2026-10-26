@@ -100,7 +100,9 @@ export function LandingNavbar() {
               type="button"
               onClick={() => setOpen((o) => !o)}
               className="icon-btn flex h-9 w-9 lg:!hidden"
-              aria-label="Toggle menu"
+              aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={open}
+              aria-controls="landing-mobile-menu"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -111,6 +113,10 @@ export function LandingNavbar() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="landing-mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

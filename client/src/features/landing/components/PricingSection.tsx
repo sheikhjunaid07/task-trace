@@ -60,7 +60,7 @@ const TIERS = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="relative overflow-hidden py-28 lg:py-36">
+    <section id="pricing" className="relative overflow-hidden py-24 lg:py-32 scroll-mt-24">
       <div
         className="lp-blob right-[-8%] top-16 h-[460px] w-[460px]"
         style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent), transparent 65%)' }}
@@ -129,11 +129,13 @@ export function PricingSection() {
 
                 <Link
                   to={tier.to}
-                  className={`btn mt-9 h-12 w-full rounded-full text-[14.5px] font-semibold ${
-                    tier.popular ? 'btn-primary' : 'btn-surface'
+                  className={`btn mt-9 h-12 w-full rounded-full text-[14.5px] transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    tier.popular
+                      ? 'btn-primary font-bold shadow-[0_8px_24px_-4px_var(--glow)] hover:shadow-[0_12px_32px_-4px_var(--glow)] hover:-translate-y-0.5 active:translate-y-0'
+                      : 'btn-surface font-semibold text-ink/80 hover:text-ink hover:bg-white/[0.08]'
                   }`}
                 >
-                  {tier.cta}
+                  <span>{tier.cta}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </motion.div>
@@ -141,11 +143,6 @@ export function PricingSection() {
           ))}
         </div>
 
-        <Reveal delay={0.2}>
-          <p className="mt-12 text-center text-[13px] font-medium text-faint">
-            All plans include unlimited tasks, real-time sync, and end-to-end encryption.
-          </p>
-        </Reveal>
       </div>
     </section>
   );

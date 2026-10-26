@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Board, User } from '../../../types';
-import { UserPlus, Activity, BarChart2, Radio, Share2 } from 'lucide-react';
+import { UserPlus, BarChart2, Radio, Share2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { toggleActivityDrawer, toggleAnalyticsModal } from '../boardSlice';
+import { toggleAnalyticsModal } from '../boardSlice';
 
 interface BoardHeaderProps {
   board: Board;
@@ -16,7 +16,7 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({
   onOpenInviteModal,
 }) => {
   const dispatch = useAppDispatch();
-  const { isActivityOpen, isAnalyticsOpen } = useAppSelector((state) => state.board);
+  const { isAnalyticsOpen } = useAppSelector((state) => state.board);
 
   const members = board.members || [];
 
@@ -73,10 +73,10 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({
 
         <button
           onClick={onOpenInviteModal}
-          className="chip hover:border-indigo-400 transition-all font-semibold text-white"
+          className="chip hover:border-white/30 transition-all font-semibold text-white"
           title="Share Board Invite Link"
         >
-          <Share2 className="w-4 h-4 text-indigo-300" />
+          <Share2 className="w-4 h-4 text-slate-300" />
           <span>Share</span>
         </button>
 
@@ -84,16 +84,8 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({
           onClick={() => dispatch(toggleAnalyticsModal())}
           className={isAnalyticsOpen ? 'chip chip-active font-semibold text-white' : 'chip font-semibold text-white'}
         >
-          <BarChart2 className="w-4 h-4 text-purple-300" />
+          <BarChart2 className="w-4 h-4 text-slate-300" />
           <span>Analytics</span>
-        </button>
-
-        <button
-          onClick={() => dispatch(toggleActivityDrawer())}
-          className={isActivityOpen ? 'chip chip-active font-semibold text-white' : 'chip font-semibold text-white'}
-        >
-          <Activity className="w-4 h-4 text-pink-300" />
-          <span>Activity</span>
         </button>
       </div>
     </div>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { Task, User, Column } from '../../../types';
-import { useUpdateTaskMutation, useDeleteTaskMutation } from '../../../api/taskApi';
+import { useUpdateTaskMutation, useDeleteTaskMutation, useArchiveTaskMutation } from '../../../api/taskApi';
 import { useAppDispatch } from '../../../app/hooks';
 import { setActiveTaskId } from '../../board/boardSlice';
-import { X, Trash2, User as UserIcon } from 'lucide-react';
+import { X, Trash2, Archive, User as UserIcon } from 'lucide-react';
 import { CommentSection } from './CommentSection';
 import { TypingIndicator } from './TypingIndicator';
 import { RichTextEditor } from '../../../components/RichTextEditor';
@@ -34,6 +34,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   const dispatch = useAppDispatch();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
   const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+  const [archiveTask, { isLoading: isArchiving }] = useArchiveTaskMutation();
 
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description || '');
@@ -45,11 +46,31 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   );
   const [conflictError, setConflictError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
 
   const resolvedBoardId =
     boardId ||
     (typeof task.board === 'string' ? task.board : (task.board as any)?._id) ||
     '';
+
+  const isDirty =
+    title !== task.title ||
+    description !== (task.description || '') ||
+    priority !== (task.priority || 'medium') ||
+    columnId !== task.columnId ||
+    dueDate !== (task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '') ||
+    JSON.stringify(selectedAssignees.slice().sort()) !==
+      JSON.stringify(
+        (task.assignees ? task.assignees.map((a) => (typeof a === 'string' ? a : a._id)) : []).slice().sort()
+      );
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   useEffect(() => {
     setTitle(task.title);
@@ -63,6 +84,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
   const handleClose = () => {
     dispatch(setActiveTaskId(null));
+  };
+
+  const handleCloseAttempt = () => {
+    if (isDirty) {
+      setIsDiscardConfirmOpen(true);
+    } else {
+      handleClose();
+    }
   };
 
   const handleSave = async () => {
@@ -96,6 +125,21 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isDeleteConfirmOpen || isDiscardConfirmOpen) return;
+        e.preventDefault();
+        handleCloseAttempt();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave, handleCloseAttempt, isDeleteConfirmOpen, isDiscardConfirmOpen]);
+
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDeleteConfirmOpen(true);
@@ -128,26 +172,46 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm cursor-pointer"
+      onClick={handleCloseAttempt}
+    >
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="task-modal-title"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-2xl max-h-[90vh] glass-card rounded-2xl p-6 border border-slate-800 shadow-2xl overflow-y-auto relative flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-2xl max-h-[90vh] glass-card rounded-2xl p-6 border border-white/10 shadow-2xl overflow-y-auto relative flex flex-col cursor-default"
+        style={{ backgroundColor: 'var(--surface, #14151a)' }}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-edge">
           <div className="flex items-center space-x-3">
             <TypingIndicator typingUsers={typingUsers} />
             {task.version && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface border border-edge text-mute font-bold">
                 v{task.version}
+              </span>
+            )}
+            {isDirty ? (
+              <span className="flex items-center space-x-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/15 border border-amber-500/30 text-amber-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span>Unsaved changes</span>
+              </span>
+            ) : (
+              <span className="flex items-center space-x-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>Saved</span>
               </span>
             )}
           </div>
           <button
-            onClick={handleClose}
-            className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 ml-auto"
+            onClick={handleCloseAttempt}
+            className="p-1 text-mute hover:text-ink rounded-lg hover:bg-surface border border-transparent hover:border-edge ml-auto transition-colors cursor-pointer"
+            title="Close (Esc)"
           >
             <X className="w-5 h-5" />
           </button>
@@ -164,7 +228,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         <div className="space-y-5 my-4">
           {/* Title Input */}
           <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-mute uppercase tracking-wider mb-1">
               Task Title
             </label>
             <input
@@ -175,13 +239,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 onTypingStart(task._id);
               }}
               onBlur={() => onTypingStop(task._id)}
-              className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-lg font-bold text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-surface border border-edge rounded-xl px-4 py-2.5 text-lg font-bold text-ink focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
           {/* TipTap Rich Text Description with Cloudinary Upload & @Member Tagging */}
           <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-mute uppercase tracking-wider mb-1">
               Formattable Description (@Member Tagging & Cloudinary Uploads)
             </label>
             <RichTextEditor
@@ -196,32 +260,32 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           {/* Priority & Column & Due Date Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-mute uppercase tracking-wider mb-1">
                 Priority
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as any)}
-                className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+                className="w-full bg-surface border border-edge rounded-xl px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent cursor-pointer transition-colors"
               >
-                <option value="low">Low Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="high">High Priority</option>
-                <option value="critical">Critical Priority</option>
+                <option value="low" className="bg-surface text-ink">Low Priority</option>
+                <option value="medium" className="bg-surface text-ink">Medium Priority</option>
+                <option value="high" className="bg-surface text-ink">High Priority</option>
+                <option value="critical" className="bg-surface text-ink">Critical Priority</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-mute uppercase tracking-wider mb-1">
                 Status / Column
               </label>
               <select
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+                className="w-full bg-surface border border-edge rounded-xl px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent cursor-pointer transition-colors"
               >
                 {columns.map((c) => (
-                  <option key={c._id} value={c._id}>
+                  <option key={c._id} value={c._id} className="bg-surface text-ink">
                     {c.name}
                   </option>
                 ))}
@@ -229,14 +293,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-mute uppercase tracking-wider mb-1">
                 Due Date
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-surface border border-edge rounded-xl px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent transition-colors"
               />
             </div>
           </div>
@@ -254,10 +318,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     key={member._id}
                     type="button"
                     onClick={() => toggleAssignee(member._id)}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500'
-                        : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800'
+                        ? 'bg-accent/20 text-accent border-accent/50 shadow-sm font-semibold'
+                        : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white'
                     }`}
                   >
                     <UserIcon className="w-3.5 h-3.5" />
@@ -273,32 +337,59 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-800 mt-auto">
-          <button
-            type="button"
-            onClick={handleDeleteClick}
-            disabled={isDeleting}
-            className="flex items-center space-x-1.5 text-xs text-rose-400 hover:text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-500/10 transition-colors cursor-pointer"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete Task</span>
-          </button>
-
-          <div className="flex space-x-3">
+        <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
+          <div className="flex items-center space-x-2">
             <button
               type="button"
-              onClick={handleClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
+              onClick={async () => {
+                try {
+                  await archiveTask({ taskId: task._id, boardId: resolvedBoardId, isArchived: true }).unwrap();
+                  showToast({
+                    type: 'TASK_UPDATED',
+                    title: 'Task Archived',
+                    message: `Task "${task.title}" archived. Restore anytime in Settings > Archives.`,
+                  });
+                  handleClose();
+                } catch (err) {
+                  console.error('Failed to archive task', err);
+                }
+              }}
+              disabled={isArchiving}
+              className="flex items-center space-x-1.5 text-xs text-amber-400 hover:text-amber-300 px-3 py-2 rounded-xl hover:bg-amber-500/10 transition-colors cursor-pointer disabled:opacity-40"
+              title="Archive this card"
             >
-              Cancel
+              <Archive className="w-4 h-4" />
+              <span>Archive</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeleteClick}
+              disabled={isDeleting}
+              className="flex items-center space-x-1.5 text-xs text-rose-400 hover:text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-500/10 transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
+            </button>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <button
+              type="button"
+              onClick={handleCloseAttempt}
+              className="px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/10 cursor-pointer flex items-center space-x-1.5 transition-colors"
+            >
+              <span>{isDirty ? 'Discard' : 'Cancel'}</span>
+              <span className="hidden sm:inline-block text-[10px] font-mono opacity-50 px-1 py-0.5 rounded bg-white/5 border border-white/10">Esc</span>
             </button>
             <button
               type="button"
               onClick={handleSave}
               disabled={isUpdating}
-              className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+              className="btn btn-primary px-4 py-2 text-xs flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
             >
-              {isUpdating ? 'Saving...' : 'Save Changes'}
+              <span>{isUpdating ? 'Saving...' : 'Save Changes'}</span>
+              <span className="hidden sm:inline-block text-[10px] font-mono opacity-80 px-1.5 py-0.5 rounded bg-black/25">⌘↵</span>
             </button>
           </div>
         </div>
@@ -306,11 +397,24 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
       <ConfirmDeleteModal
         isOpen={isDeleteConfirmOpen}
-        title="Are you want to delete?"
+        title="Delete Task?"
         itemName={title || task.title}
         isLoading={isDeleting}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setIsDeleteConfirmOpen(false)}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={isDiscardConfirmOpen}
+        title="Discard Unsaved Changes?"
+        message="You have unsaved edits to this task. Are you sure you want to discard your changes?"
+        confirmLabel="Discard"
+        cancelLabel="Keep Editing"
+        onConfirm={() => {
+          setIsDiscardConfirmOpen(false);
+          handleClose();
+        }}
+        onCancel={() => setIsDiscardConfirmOpen(false)}
       />
     </div>
   );

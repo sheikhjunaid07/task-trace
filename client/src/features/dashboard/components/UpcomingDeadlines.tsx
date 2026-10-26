@@ -175,7 +175,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
         dayLabel: `Overdue by ${overdueBy}d`,
         tagColor:
           "bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm shadow-rose-950/30",
-        cardBorder: "border-l-4 border-l-rose-500",
+        cardBorder: "",
         badge: "🚨 Overdue",
         badgeColor: "bg-rose-950/60 text-rose-300 border-rose-700/50",
         icon: AlertTriangle,
@@ -189,7 +189,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
         dayLabel: "Due Today",
         tagColor:
           "bg-red-500/20 text-red-300 border-red-500/40 shadow-sm shadow-red-950/30",
-        cardBorder: "border-l-4 border-l-red-500",
+        cardBorder: "",
         badge: "🔥 Due Today",
         badgeColor: "bg-red-950/60 text-red-300 border-red-700/50",
         icon: Flame,
@@ -203,7 +203,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
         dayLabel: "Due Tomorrow",
         tagColor:
           "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-950/30",
-        cardBorder: "border-l-4 border-l-amber-500",
+        cardBorder: "",
         badge: "⚡ Tomorrow",
         badgeColor: "bg-amber-950/60 text-amber-300 border-amber-700/50",
         icon: Clock,
@@ -216,7 +216,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
         level: "HIGH",
         dayLabel: `In ${daysRemaining} days`,
         tagColor: "bg-orange-500/20 text-orange-300 border-orange-500/40",
-        cardBorder: "border-l-4 border-l-orange-500",
+        cardBorder: "",
         badge: `⏳ ${daysRemaining} days left`,
         badgeColor: "bg-orange-950/60 text-orange-300 border-orange-700/50",
         icon: Clock,
@@ -229,7 +229,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
         level: "MEDIUM",
         dayLabel: `In ${daysRemaining} days`,
         tagColor: "bg-sky-500/20 text-sky-300 border-sky-500/35",
-        cardBorder: "border-l-4 border-l-sky-500",
+        cardBorder: "",
         badge: `📅 ${daysRemaining} days left`,
         badgeColor: "bg-sky-950/60 text-sky-300 border-sky-700/50",
         icon: Calendar,
@@ -242,7 +242,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
         level: "MEDIUM",
         dayLabel: `In ${daysRemaining} days (≤ 10d)`,
         tagColor: "bg-purple-500/20 text-purple-300 border-purple-500/35",
-        cardBorder: "border-l-4 border-l-purple-500",
+        cardBorder: "",
         badge: `🗓️ ${daysRemaining} days left`,
         badgeColor: "bg-purple-950/60 text-purple-300 border-purple-700/50",
         icon: Calendar,
@@ -255,7 +255,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
       level: "SCHEDULED",
       dayLabel: `In ${daysRemaining} days (> 10d)`,
       tagColor: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-      cardBorder: "border-l-4 border-l-emerald-600/70",
+      cardBorder: "",
       badge: `📆 ${daysRemaining} days (Later)`,
       badgeColor: "bg-emerald-950/50 text-emerald-300 border-emerald-700/40",
       icon: CalendarCheck,
@@ -334,7 +334,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
 
             <Link
               to="/boards"
-              className="text-xs font-bold text-purple-300 hover:text-white hover:underline flex items-center gap-1 transition-colors ml-1"
+              className="text-xs font-bold text-accent hover:underline flex items-center gap-1 transition-colors ml-1"
             >
               <span>View All</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -354,7 +354,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
                 onClick={() => setScope("project")}
                 className={`px-2.5 py-1 rounded-lg font-bold transition-all text-xs ${
                   scope === "project"
-                    ? "bg-purple-600 text-white shadow-sm"
+                    ? "bg-accent text-on-accent shadow-sm"
                     : "text-mute hover:text-ink"
                 }`}
               >
@@ -364,7 +364,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
                 onClick={() => setScope("workspace")}
                 className={`px-2.5 py-1 rounded-lg font-bold transition-all text-xs ${
                   scope === "workspace"
-                    ? "bg-purple-600 text-white shadow-sm"
+                    ? "bg-accent text-on-accent shadow-sm"
                     : "text-mute hover:text-ink"
                 }`}
               >
@@ -381,7 +381,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
             onClick={() => setActiveTab("all")}
             className={`flex-1 min-w-[70px] py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "all"
-                ? "bg-purple-600 text-white shadow-md"
+                ? "bg-accent text-on-accent shadow-md font-bold"
                 : "text-mute hover:text-ink hover:bg-white/5"
             }`}
           >
@@ -389,7 +389,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] ${
                 activeTab === "all"
-                  ? "bg-white/20 text-white"
+                  ? "bg-white/20 text-inherit font-bold"
                   : "bg-surface text-mute"
               }`}
             >
@@ -402,7 +402,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
             onClick={() => setActiveTab("under10")}
             className={`flex-1 min-w-[105px] py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "under10"
-                ? "bg-amber-600 text-white shadow-md"
+                ? "bg-amber-600 text-white shadow-md font-bold"
                 : "text-mute hover:text-ink hover:bg-white/5"
             }`}
           >
@@ -413,10 +413,10 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
               </span>
             </span>
             <span
-              className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+              className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                 activeTab === "under10"
                   ? "bg-white/20 text-white"
-                  : "bg-surface text-amber-400"
+                  : "bg-surface text-amber-500"
               }`}
             >
               {under10Count}
@@ -428,7 +428,7 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
             onClick={() => setActiveTab("after10")}
             className={`flex-1 min-w-[100px] py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "after10"
-                ? "bg-emerald-600 text-white shadow-md"
+                ? "bg-emerald-600 text-white shadow-md font-bold"
                 : "text-mute hover:text-ink hover:bg-white/5"
             }`}
           >
@@ -439,10 +439,10 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
               </span>
             </span>
             <span
-              className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+              className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                 activeTab === "after10"
                   ? "bg-white/20 text-white"
-                  : "bg-surface text-emerald-400"
+                  : "bg-surface text-emerald-500"
               }`}
             >
               {after10Count}
@@ -455,12 +455,12 @@ export const UpcomingDeadlines: React.FC<UpcomingDeadlinesProps> = ({
               onClick={() => setActiveTab("overdue")}
               className={`py-1.5 px-3 rounded-lg text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === "overdue"
-                  ? "bg-rose-600 text-white shadow-md"
-                  : "text-rose-400 hover:text-rose-200 hover:bg-rose-500/10"
+                  ? "bg-rose-600 text-white shadow-md font-bold"
+                  : "text-rose-500 hover:text-rose-600 hover:bg-rose-500/10"
               }`}
             >
               <span>Overdue</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500/30 text-rose-200 font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500/20 text-rose-500 font-bold">
                 {overdueCount}
               </span>
             </button>

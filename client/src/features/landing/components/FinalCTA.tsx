@@ -8,7 +8,7 @@ const BLOBS = [
     size: 620,
     top: '-18%',
     left: '8%',
-    color: 'rgba(139,92,246,0.5)',
+    color: 'color-mix(in srgb, var(--accent) 30%, transparent)',
     duration: 19,
     drift: { x: 140, y: 90 },
   },
@@ -16,7 +16,7 @@ const BLOBS = [
     size: 520,
     top: '20%',
     left: '62%',
-    color: 'rgba(168,85,247,0.4)',
+    color: 'color-mix(in srgb, var(--accent-2) 24%, transparent)',
     duration: 24,
     drift: { x: -170, y: 110 },
   },
@@ -24,7 +24,7 @@ const BLOBS = [
     size: 460,
     top: '46%',
     left: '30%',
-    color: 'rgba(99,102,241,0.34)',
+    color: 'color-mix(in srgb, var(--glow) 28%, transparent)',
     duration: 27,
     drift: { x: 150, y: -120 },
   },
@@ -32,7 +32,7 @@ const BLOBS = [
     size: 380,
     top: '8%',
     left: '44%',
-    color: 'rgba(217,70,239,0.26)',
+    color: 'color-mix(in srgb, var(--accent) 20%, transparent)',
     duration: 21,
     drift: { x: -110, y: 70 },
   },
@@ -40,11 +40,11 @@ const BLOBS = [
 
 export function FinalCTA() {
   return (
-    <section className="relative overflow-hidden py-32 lg:py-44">
+    <section className="relative overflow-hidden py-28 lg:py-36">
       {/* animated gradient mesh */}
       <div
         className="absolute inset-0"
-        style={{ background: 'color-mix(in srgb, #07070c 92%, var(--bg))' }}
+        style={{ background: 'color-mix(in srgb, var(--surface) 90%, var(--bg))' }}
       />
       {BLOBS.map((b, i) => (
         <motion.div
@@ -106,18 +106,18 @@ export function FinalCTA() {
           <div className="mt-11 flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/register"
-              className="btn btn-primary h-14 rounded-full px-9 text-[15.5px] font-semibold"
+              className="btn btn-primary h-14 rounded-full px-9 text-[15.5px] font-bold shadow-[0_12px_36px_-8px_var(--glow)] hover:shadow-[0_18px_48px_-6px_var(--glow)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 cursor-pointer"
             >
-              Get Started Free
+              <span>Get Started Free</span>
               <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link
-              to="/register"
-              className="btn lp-glass h-14 rounded-full px-8 text-[15px] font-semibold text-ink"
+            <a
+              href="#features"
+              className="btn lp-glass h-14 rounded-full px-8 text-[15px] font-semibold text-ink/85 hover:text-ink hover:bg-white/[0.08] transition-all flex items-center gap-2 cursor-pointer"
             >
               <CalendarClock className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-              Book Demo
-            </Link>
+              <span>See How It Works</span>
+            </a>
           </div>
         </Reveal>
 

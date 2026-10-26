@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi';
-import type { Board, Invitation, User } from '../types';
+import type { Board, Invitation, User, Column, BoardLabel, Task } from '../types';
 
 export interface SingleBoardResponse {
   statusCode: number;
@@ -121,6 +121,52 @@ export const boardApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { boardId }) => [{ type: 'Board', id: boardId }],
     }),
+    updateBoard: builder.mutation<
+      SingleBoardResponse,
+      {
+        boardId: string;
+        name?: string;
+        title?: string;
+        description?: string;
+        icon?: string;
+        color?: string;
+        avatarUrl?: string | null;
+        visibility?: 'public' | 'private';
+        labels?: BoardLabel[];
+      }
+    >({
+      query: ({ boardId, ...body }) => ({
+        url: `/boards/${boardId}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [
+        { type: 'Board', id: boardId },
+        { type: 'Board', id: 'LIST' },
+      ],
+    }),
+    updateMemberRole: builder.mutation<
+      { statusCode: number; message: string; data: { userId: string; role: string } },
+      { boardId: string; userId: string; role: 'admin' | 'member' | 'viewer' }
+    >({
+      query: ({ boardId, userId, role }) => ({
+        url: `/boards/${boardId}/members/${userId}/role`,
+        method: 'PATCH',
+        body: { role },
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [{ type: 'Board', id: boardId }],
+    }),
+    transferOwnership: builder.mutation<SingleBoardResponse, { boardId: string; newOwnerId: string }>({
+      query: ({ boardId, newOwnerId }) => ({
+        url: `/boards/${boardId}/transfer-ownership`,
+        method: 'POST',
+        body: { newOwnerId },
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [
+        { type: 'Board', id: boardId },
+        { type: 'Board', id: 'LIST' },
+      ],
+    }),
     deleteBoard: builder.mutation<{ statusCode: number; message: string }, string>({
       query: (boardId) => ({
         url: `/boards/${boardId}`,
@@ -215,6 +261,74 @@ export const boardApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Board', id: 'LIST' }],
     }),
+
+    // WIP Limits & Column Archiving
+    updateColumnWipLimit: builder.mutation<
+      { statusCode: number; message: string; data: Column },
+      { boardId: string; columnId: string; wipLimit: number | null }
+    >({
+      query: ({ boardId, columnId, wipLimit }) => ({
+        url: `/boards/${boardId}/columns/${columnId}/wip-limit`,
+        method: 'PATCH',
+        body: { wipLimit },
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [{ type: 'Board', id: boardId }],
+    }),
+    archiveColumn: builder.mutation<
+      { statusCode: number; message: string; data: Column },
+      { boardId: string; columnId: string; isArchived: boolean }
+    >({
+      query: ({ boardId, columnId, isArchived }) => ({
+        url: `/boards/${boardId}/columns/${columnId}/archive`,
+        method: 'PATCH',
+        body: { isArchived },
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [
+        { type: 'Board', id: boardId },
+        { type: 'Board', id: `ARCHIVES_${boardId}` },
+      ],
+    }),
+
+    // Archives Management
+    getBoardArchives: builder.query<
+      { statusCode: number; message: string; data: { tasks: Task[]; columns: Column[] } },
+      string
+    >({
+      query: (boardId) => `/boards/${boardId}/archives`,
+      providesTags: (_result, _error, boardId) => [{ type: 'Board', id: `ARCHIVES_${boardId}` }],
+    }),
+    restoreArchivedItem: builder.mutation<
+      { statusCode: number; message: string; data: any },
+      { boardId: string; type: 'task' | 'column'; itemId: string }
+    >({
+      query: ({ boardId, type, itemId }) => ({
+        url: `/boards/${boardId}/archives/restore`,
+        method: 'POST',
+        body: { type, itemId },
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [
+        { type: 'Board', id: boardId },
+        { type: 'Board', id: `ARCHIVES_${boardId}` },
+        { type: 'Task', id: `BOARD_${boardId}` },
+        { type: 'Task', id: 'LIST' },
+      ],
+    }),
+    permanentDeleteArchivedItem: builder.mutation<
+      { statusCode: number; message: string; data: null },
+      { boardId: string; type: 'task' | 'column'; itemId: string }
+    >({
+      query: ({ boardId, type, itemId }) => ({
+        url: `/boards/${boardId}/archives/permanent`,
+        method: 'DELETE',
+        body: { type, itemId },
+      }),
+      invalidatesTags: (_result, _error, { boardId }) => [
+        { type: 'Board', id: boardId },
+        { type: 'Board', id: `ARCHIVES_${boardId}` },
+        { type: 'Task', id: `BOARD_${boardId}` },
+        { type: 'Task', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
@@ -224,6 +338,9 @@ export const {
   useGetBoardsQuery,
   useGetBoardByIdQuery,
   useCreateBoardMutation,
+  useUpdateBoardMutation,
+  useUpdateMemberRoleMutation,
+  useTransferOwnershipMutation,
   useInviteMemberMutation,
   useRemoveMemberMutation,
   useDeleteBoardMutation,
@@ -231,6 +348,11 @@ export const {
   useRenameColumnMutation,
   useRemoveColumnMutation,
   useReorderColumnsMutation,
+  useUpdateColumnWipLimitMutation,
+  useArchiveColumnMutation,
+  useGetBoardArchivesQuery,
+  useRestoreArchivedItemMutation,
+  usePermanentDeleteArchivedItemMutation,
   useGetPendingInvitationsQuery,
   useGetBoardInvitationsQuery,
   useRespondInvitationMutation,

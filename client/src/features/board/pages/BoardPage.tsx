@@ -12,6 +12,7 @@ import { ActivityTimeline } from '../components/ActivityTimeline';
 import { AnalyticsPanel } from '../components/AnalyticsPanel';
 import { KanbanBoard } from '../../kanban/components/KanbanBoard';
 import { TaskModal } from '../../kanban/components/TaskModal';
+import { KeyboardShortcutsModal } from '../../../components/KeyboardShortcutsModal';
 import { ArrowLeft, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -55,6 +56,7 @@ export const BoardPage: React.FC = () => {
   } = useSocketEvents(boardId);
 
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
 
   if (isBoardLoading || isTasksLoading) {
     return (
@@ -153,7 +155,12 @@ export const BoardPage: React.FC = () => {
         onOpenInviteModal={() => setIsMembersModalOpen(true)}
       />
 
-      <FilterBar members={board.members || []} />
+      <FilterBar
+        members={board.members || []}
+        totalTasksCount={rawTasks.length}
+        filteredTasksCount={filteredTasks.length}
+        onOpenShortcuts={() => setIsShortcutsModalOpen(true)}
+      />
 
       <KanbanBoard
         boardId={board._id}
@@ -197,6 +204,11 @@ export const BoardPage: React.FC = () => {
       <AnimatePresence>
         {isAnalyticsOpen && <AnalyticsPanel tasks={rawTasks} columns={board.columns || []} />}
       </AnimatePresence>
+
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsModalOpen}
+        onClose={() => setIsShortcutsModalOpen(false)}
+      />
     </div>
   );
 };

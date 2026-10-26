@@ -51,13 +51,13 @@ const CARDS: {
     icon: Server,
     title: 'Built for Scale',
     text: 'From 3-person startups to 3,000-person orgs. Infrastructure that grows with your ambition.',
-    glow: '#a855f7',
+    glow: 'var(--accent)',
   },
 ];
 
 export function WhyTaskTrace() {
   return (
-    <section id="why" className="relative overflow-hidden py-28 lg:py-36">
+    <section id="why" className="relative overflow-hidden py-24 lg:py-32 scroll-mt-24">
       <div className="lp-noise" />
 
       <div className="relative z-10 mx-auto max-w-[1240px] px-5 sm:px-8">

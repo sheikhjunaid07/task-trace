@@ -73,7 +73,7 @@ export const getBoardTasks = asyncHandler(async (req: Request, res: Response) =>
   if (!board) throw new ApiError(404, "Board not found");
   assertBoardAccess(board, uid(req));
 
-  const tasks = await Task.find({ board: boardId })
+  const tasks = await Task.find({ board: boardId, isArchived: { $ne: true } })
     .sort({ position: 1, _id: 1 })
     .populate("assignees", "name email avatar");
 
@@ -102,7 +102,7 @@ export const getColumnTasks = asyncHandler(async (req: Request, res: Response) =
   if (!board) throw new ApiError(404, "Board not found");
   assertBoardAccess(board, uid(req));
 
-  const tasks = await Task.find({ board: boardId, columnId })
+  const tasks = await Task.find({ board: boardId, columnId, isArchived: { $ne: true } })
     .sort({ position: 1, _id: 1 })
     .populate("assignees", "name email avatar");
 
@@ -473,4 +473,38 @@ export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
   }
 
   res.json(response);
+});
+
+export const archiveTask = asyncHandler(async (req: Request, res: Response) => {
+  const { taskId } = req.params;
+  const { isArchived = true } = req.body as { isArchived?: boolean };
+
+  const task = await Task.findById(taskId);
+  if (!task) throw new ApiError(404, "Task not found");
+
+  const board = await Board.findById(task.board);
+  if (!board) throw new ApiError(404, "Board not found");
+  assertBoardAccess(board, uid(req));
+
+  task.isArchived = isArchived;
+  await task.save();
+  await task.populate("assignees", "name email avatar");
+
+  await ActivityService.log(
+    req.user!._id,
+    String(task.board),
+    isArchived ? "TASK_ARCHIVED" : "TASK_RESTORED",
+    `${isArchived ? "archived" : "restored"} task "${task.title}"`,
+    { taskId: String(task._id) },
+    String(task._id)
+  );
+
+  io.to(`board:${String(task.board)}`).emit("task:archived", {
+    boardId: String(task.board),
+    taskId: String(task._id),
+    isArchived: task.isArchived,
+    task,
+  });
+
+  res.json(new ApiResponse(200, isArchived ? "Task archived" : "Task restored", task));
 });

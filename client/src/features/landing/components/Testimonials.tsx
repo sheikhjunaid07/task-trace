@@ -52,7 +52,7 @@ const COLUMNS = [0, 1, 2].map((i) => TESTIMONIALS.filter((_, idx) => idx % 3 ===
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="relative overflow-hidden py-28 lg:py-36">
+    <section id="testimonials" className="relative overflow-hidden py-24 lg:py-32 scroll-mt-24">
       <div
         className="lp-blob left-[-10%] top-1/3 h-[480px] w-[480px]"
         style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--accent) 9%, transparent), transparent 65%)' }}
@@ -61,16 +61,16 @@ export function Testimonials() {
 
       <div className="relative z-10 mx-auto max-w-[1240px] px-5 sm:px-8">
         <SectionHeading
-          eyebrow="Loved by teams"
+          eyebrow="Loved by builders"
           title={
             <>
-              Don&apos;t take our word for it.
+              Engineered for flow. <span className="lp-text-gradient">Loved by teams.</span>
             </>
           }
-          description="From two-person startups to global product teams — here's what happens when work finally flows."
+          description="From independent creators to high-velocity engineering squads — here is what happens when work flows without friction."
         />
 
-        <div className="mt-20 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {COLUMNS.map((col, colIdx) => (
             <div
               key={colIdx}
@@ -110,7 +110,7 @@ export function Testimonials() {
                       </span>
                       <div>
                         <p className="text-[13.5px] font-bold text-ink">{t.name}</p>
-                        <p className="text-[11.5px] font-medium text-faint">{t.role}</p>
+                        <p className="text-[12px] font-medium text-mute">{t.role}</p>
                       </div>
                     </figcaption>
                   </motion.figure>

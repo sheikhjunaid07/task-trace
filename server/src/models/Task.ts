@@ -13,6 +13,7 @@ export interface ITask {
   position: number;
   version: number;
   createdBy: Types.ObjectId;
+  isArchived?: boolean;
 }
 
 const taskSchema = new Schema<ITask>(
@@ -37,6 +38,7 @@ const taskSchema = new Schema<ITask>(
     position: { type: Number, required: true, default: 0 },
     version: { type: Number, required: true, default: 1 },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    isArchived: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );

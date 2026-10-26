@@ -10,6 +10,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { showToast } from './ToastNotification';
@@ -86,7 +87,8 @@ export const LeftSidebar: React.FC = () => {
   };
 
   const isDashboardActive = location.pathname === '/dashboard' || location.pathname === '/';
-  const isProjectsActive = location.pathname.startsWith('/boards') || location.pathname.startsWith('/projects');
+  const isSettingsActive = location.pathname.includes('/settings');
+  const isProjectsActive = (location.pathname.startsWith('/boards') || location.pathname.startsWith('/projects')) && !isSettingsActive;
   const isTeamActive = location.pathname.startsWith('/team') || location.pathname.startsWith('/members');
 
   return (
@@ -150,11 +152,13 @@ export const LeftSidebar: React.FC = () => {
                 </div>
               </div>
 
-              <h2 className="text-base font-bold text-ink tracking-tight leading-snug truncate" title={currentProjectName}>
-                {currentProjectName}
-              </h2>
+              <div className="flex items-center gap-2 mb-0.5">
+                <h2 className="text-base font-bold text-ink tracking-tight leading-snug truncate" title={currentProjectName}>
+                  {currentProjectName}
+                </h2>
+              </div>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-xs font-semibold ${isUserAdmin ? 'text-purple-300' : 'text-blue-300'}`}>
+                <span className={`text-xs font-semibold ${isUserAdmin ? 'text-purple-400' : 'text-blue-500'}`}>
                   Role: {isUserAdmin ? 'admin' : 'member'}
                 </span>
               </div>
@@ -173,13 +177,13 @@ export const LeftSidebar: React.FC = () => {
                 : 'w-full gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm'
             } ${
               isDashboardActive
-                ? 'bg-purple-600/35 text-white border border-purple-500/60 shadow-sm font-bold'
+                ? 'sidebar-nav-active font-bold shadow-sm'
                 : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
             }`}
             title="Dashboard"
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <LayoutDashboard className={`w-4 h-4 ${isDashboardActive ? 'text-white' : 'text-mute group-hover:text-ink'}`} />
+              <LayoutDashboard className={`w-4 h-4 ${isDashboardActive ? 'text-inherit' : 'text-mute group-hover:text-ink'}`} />
             </div>
             {!isCollapsed && <span className="truncate">Dashboard</span>}
           </Link>
@@ -193,13 +197,13 @@ export const LeftSidebar: React.FC = () => {
                 : 'w-full gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm'
             } ${
               isProjectsActive && !isDashboardActive
-                ? 'bg-purple-600/35 text-white border border-purple-500/60 shadow-sm font-bold'
+                ? 'sidebar-nav-active font-bold shadow-sm'
                 : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
             }`}
             title="Projects & Tasks"
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <FolderKanban className={`w-4 h-4 ${isProjectsActive && !isDashboardActive ? 'text-white' : 'text-mute group-hover:text-ink'}`} />
+              <FolderKanban className={`w-4 h-4 ${isProjectsActive && !isDashboardActive ? 'text-inherit' : 'text-mute group-hover:text-ink'}`} />
             </div>
             {!isCollapsed && <span className="truncate">Projects & Tasks</span>}
           </Link>
@@ -213,25 +217,47 @@ export const LeftSidebar: React.FC = () => {
                 : 'w-full gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm'
             } ${
               isTeamActive
-                ? 'bg-purple-600/35 text-white border border-purple-500/60 shadow-sm font-bold'
+                ? 'sidebar-nav-active font-bold shadow-sm'
                 : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
             }`}
             title="Team Members"
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <Users className={`w-4 h-4 ${isTeamActive ? 'text-white' : 'text-mute group-hover:text-ink'}`} />
+              <Users className={`w-4 h-4 ${isTeamActive ? 'text-inherit' : 'text-mute group-hover:text-ink'}`} />
             </div>
             {!isCollapsed && <span className="truncate">Team Members</span>}
           </Link>
         </nav>
 
-        {/* Sidebar Footer with collapse/expand button */}
-        <div className="p-3 border-t border-edge flex items-center justify-center">
+        {/* Sidebar Footer with Settings & collapse/expand button */}
+        <div className="p-3 border-t border-edge flex flex-col gap-1.5">
+          {/* Settings Nav Item */}
+          <Link
+            to={currentBoard ? `/boards/${currentBoard._id}/settings` : '/settings'}
+            className={`transition-all group flex items-center ${
+              isCollapsed
+                ? 'w-10 h-10 justify-center rounded-xl mx-auto'
+                : 'w-full gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm'
+            } ${
+              isSettingsActive
+                ? 'sidebar-nav-active font-bold shadow-sm'
+                : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] border border-transparent font-medium'
+            }`}
+            title="Settings"
+            aria-label="Settings"
+          >
+            <div className="w-5 h-5 flex items-center justify-center shrink-0">
+              <Settings className={`w-4 h-4 ${isSettingsActive ? 'text-inherit' : 'text-mute group-hover:text-ink transition-transform group-hover:rotate-45'}`} />
+            </div>
+            {!isCollapsed && <span className="truncate">Settings</span>}
+          </Link>
+
+          {/* Collapse/Expand Toggle */}
           {isCollapsed ? (
             <button
               type="button"
               onClick={toggleCollapsed}
-              className="w-10 h-10 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-edge"
+              className="w-10 h-10 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-edge mx-auto"
               title="Expand sidebar"
               aria-label="Expand sidebar"
             >

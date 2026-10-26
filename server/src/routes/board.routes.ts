@@ -8,6 +8,9 @@ import {
   renameColumnSchema,
   addMemberSchema,
   respondInvitationSchema,
+  updateMemberRoleSchema,
+  transferOwnershipSchema,
+  setWipLimitSchema,
 } from "../validators/board.validator";
 import { createTaskSchema } from "../validators/task.validator";
 import * as boardController from "../controllers/board.controller";
@@ -46,14 +49,23 @@ router.delete("/:boardId", boardController.deleteBoard);
 router.post("/:boardId/columns", validate(addColumnSchema), boardController.addColumn);
 router.patch("/:boardId/columns/reorder", boardController.reorderColumns);
 router.patch("/:boardId/columns/:columnId", validate(renameColumnSchema), boardController.renameColumn);
+router.patch("/:boardId/columns/:columnId/wip-limit", validate(setWipLimitSchema), boardController.updateColumnWipLimit);
+router.patch("/:boardId/columns/:columnId/archive", boardController.archiveColumn);
 router.delete("/:boardId/columns/:columnId", boardController.removeColumn);
 
-// Members & Share Link per Board
+// Members & RBAC & Ownership
 router.post("/:boardId/members", validate(addMemberSchema), boardController.addMember);
+router.patch("/:boardId/members/:userId/role", validate(updateMemberRoleSchema), boardController.updateMemberRole);
+router.post("/:boardId/transfer-ownership", validate(transferOwnershipSchema), boardController.transferOwnership);
 router.delete("/:boardId/members/:userId", boardController.removeMember);
 router.get("/:boardId/invitations", boardController.getBoardInvitations);
 router.get("/:boardId/invite-code", boardController.getBoardInviteCode);
 router.post("/:boardId/regenerate-invite-code", boardController.regenerateBoardInviteCode);
+
+// Archives Management
+router.get("/:boardId/archives", boardController.getBoardArchives);
+router.post("/:boardId/archives/restore", boardController.restoreArchivedItem);
+router.delete("/:boardId/archives/permanent", boardController.permanentDeleteArchivedItem);
 
 // Tasks under board context
 router.get("/:boardId/tasks", taskController.getBoardTasks);

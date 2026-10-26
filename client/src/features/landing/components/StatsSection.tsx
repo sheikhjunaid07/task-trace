@@ -24,7 +24,7 @@ function StatItem({ stat, delay }: { stat: Stat; delay: number }) {
   return (
     <Reveal delay={delay} className="flex flex-col items-center gap-3 px-4 text-center">
       <span className="lp-stat-num text-ink">
-        <span ref={ref}>{value}</span>
+        <span ref={ref}>{stat.decimals ? value.toFixed(stat.decimals) : value}</span>
         <span className="lp-text-gradient">{stat.suffix}</span>
       </span>
       <span className="text-[14px] font-semibold tracking-wide text-mute">{stat.label}</span>

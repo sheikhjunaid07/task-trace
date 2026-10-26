@@ -3,6 +3,7 @@ import {
   AnimatePresence,
   motion,
   useMotionValue,
+  useReducedMotion,
   useSpring,
   useTransform,
 } from 'framer-motion';
@@ -191,7 +192,7 @@ function Card({ task }: { task: KbTask }) {
 function Column({ id, tasks }: { id: ColId; tasks: KbTask[] }) {
   return (
     <div
-      className="lp-kb-col min-h-0 w-[180px] shrink-0 rounded-xl bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] p-2 sm:w-auto sm:shrink"
+      className="lp-kb-col min-h-0 w-[78vw] max-w-[250px] shrink-0 snap-center rounded-xl bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] p-2 sm:w-auto sm:max-w-none sm:shrink sm:snap-align-none"
       style={{ ['--col' as string]: COLORS[id] }}
     >
       <div className="mb-2 flex items-center justify-between px-1">
@@ -241,6 +242,7 @@ export function HeroKanban() {
   const [cols, setCols] = useState<Record<ColId, KbTask[]>>(INITIAL);
   const [toast, setToast] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
 
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
@@ -254,6 +256,7 @@ export function HeroKanban() {
   });
 
   useEffect(() => {
+    if (reduced) return;
     const advance = setInterval(() => {
       setCols((prev) => {
         if (!prev.todo.length) {
@@ -288,9 +291,10 @@ export function HeroKanban() {
   }, []);
 
   useEffect(() => {
+    if (reduced) return;
     const t = setInterval(() => setToast((v) => (v + 1) % TOASTS.length), 5200);
     return () => clearInterval(t);
-  }, []);
+  }, [reduced]);
 
   const totalTasks = cols.todo.length + cols.inprogress.length + cols.done.length;
 
@@ -298,6 +302,7 @@ export function HeroKanban() {
     <div
       ref={ref}
       onPointerMove={(e) => {
+        if (e.pointerType === 'touch') return;
         const r = ref.current?.getBoundingClientRect();
         if (!r) return;
         mx.set((e.clientX - r.left) / r.width);
@@ -383,7 +388,7 @@ export function HeroKanban() {
       >
         <div className="lp-float" style={{ animationDelay: '0.8s' }}>
           <motion.div
-            style={{ rotateX, rotateY }}
+            style={{ rotateX: reduced ? 0 : rotateX, rotateY: reduced ? 0 : rotateY }}
             className="lp-kb-board"
           >
           <div className="lp-glass-deep rounded-[24px] p-3.5">
@@ -410,9 +415,9 @@ export function HeroKanban() {
                 <span
                   className="rounded-full px-3 py-1.5 text-[9.5px] font-bold"
                   style={{
-                    background: 'linear-gradient(135deg,#8b5cf6,#a855f7)',
+                    background: 'var(--grad-accent)',
                     color: '#fff',
-                    boxShadow: '0 4px 14px -4px rgba(139,92,246,0.55)',
+                    boxShadow: '0 4px 14px -4px var(--glow)',
                   }}
                 >
                   Share
@@ -420,8 +425,20 @@ export function HeroKanban() {
               </div>
             </div>
 
+            {/* mobile swipe cue */}
+            <div className="mb-2 flex items-center justify-between px-1 text-[11px] sm:hidden">
+              <span className="flex items-center gap-1.5 font-semibold text-mute">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="lp-ping absolute inline-flex h-full w-full rounded-full bg-success" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+                </span>
+                Live sync
+              </span>
+              <span className="text-[10px] font-medium text-mute">Swipe columns →</span>
+            </div>
+
             {/* columns */}
-            <div className="flex gap-2.5 overflow-x-auto pb-2 pt-0.5 sm:grid sm:grid-cols-3 sm:overflow-visible">
+            <div className="flex gap-2.5 overflow-x-auto pb-2 pt-0.5 snap-x snap-mandatory scroll-smooth sm:grid sm:grid-cols-3 sm:overflow-visible sm:snap-none">
               <Column id="todo" tasks={cols.todo} />
               <Column id="inprogress" tasks={cols.inprogress} />
               <Column id="done" tasks={cols.done} />
@@ -431,7 +448,7 @@ export function HeroKanban() {
         </div>
       </motion.div>
 
-      {/* live toast */}
+      {/* live toast — desktop floating */}
       <div className="absolute -right-4 top-16 z-20 hidden lg:block">
         <AnimatePresence mode="wait">
           <motion.div
@@ -448,6 +465,30 @@ export function HeroKanban() {
                 <>
                   <T.icon className="h-4 w-4 shrink-0" style={{ color: T.color }} />
                   <p className="max-w-[170px] text-[11.5px] font-medium text-ink">{T.text}</p>
+                </>
+              );
+            })()}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* live toast — mobile inline pill */}
+      <div className="mt-3 flex justify-center lg:hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={toast}
+            initial={{ opacity: 0, y: 6, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.96 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="lp-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5"
+          >
+            {(() => {
+              const T = TOASTS[toast];
+              return (
+                <>
+                  <T.icon className="h-3.5 w-3.5 shrink-0" style={{ color: T.color }} />
+                  <p className="text-[11px] font-medium text-ink">{T.text}</p>
                 </>
               );
             })()}

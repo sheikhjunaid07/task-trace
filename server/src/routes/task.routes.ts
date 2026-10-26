@@ -27,6 +27,7 @@ router.post(
 );
 router.patch("/:taskId", validate(updateTaskSchema), taskController.updateTask);
 router.patch("/:taskId/move", validate(moveTaskSchema), taskController.moveTask);
+router.patch("/:taskId/archive", taskController.archiveTask);
 router.delete("/:taskId", taskController.deleteTask);
 
 // Comment routes under task context (matching client/src/api/commentApi.ts)

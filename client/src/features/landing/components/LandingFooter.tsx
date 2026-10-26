@@ -26,16 +26,47 @@ const YOUTUBE_ICON = (
 );
 
 const SOCIALS = [
-  { label: 'X', icon: X_ICON, href: 'https://x.com' },
+  { label: 'X (Twitter)', icon: X_ICON, href: 'https://x.com' },
   { label: 'GitHub', icon: GITHUB_ICON, href: 'https://github.com' },
   { label: 'LinkedIn', icon: LINKEDIN_ICON, href: 'https://linkedin.com' },
   { label: 'YouTube', icon: YOUTUBE_ICON, href: 'https://youtube.com' },
 ];
 
-const LINKS: { title: string; items: string[] }[] = [
-  { title: 'Product', items: ['Features', 'Workflow', 'Pricing', 'Changelog'] },
-  { title: 'Company', items: ['About', 'Blog', 'Careers', 'Contact'] },
-  { title: 'Resources', items: ['Docs', 'Help Center', 'API', 'Community'] },
+interface FooterItem {
+  label: string;
+  href: string;
+  isExternal?: boolean;
+  isRoute?: boolean;
+}
+
+const LINKS: { title: string; items: FooterItem[] }[] = [
+  {
+    title: 'Product',
+    items: [
+      { label: 'Features', href: '#features' },
+      { label: 'Workflow', href: '#workflow' },
+      { label: 'Product Tour', href: '#product' },
+      { label: 'Pricing', href: '#pricing' },
+    ],
+  },
+  {
+    title: 'Company',
+    items: [
+      { label: 'Why TaskTrace', href: '#why' },
+      { label: 'Testimonials', href: '#testimonials' },
+      { label: 'Sign In', href: '/login', isRoute: true },
+      { label: 'Register', href: '/register', isRoute: true },
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { label: 'Documentation', href: '#features' },
+      { label: 'Keyboard Shortcuts', href: '#product' },
+      { label: 'System Uptime', href: '#why' },
+      { label: 'Community', href: 'https://github.com', isExternal: true },
+    ],
+  },
 ];
 
 export function LandingFooter() {
@@ -59,9 +90,9 @@ export function LandingFooter() {
                   key={s.label}
                   href={s.href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-edge text-mute transition-all duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--border))] hover:text-ink"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-edge text-mute transition-all duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--accent)_40%,var(--border))] hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
                 >
                   {s.icon}
                 </a>
@@ -72,18 +103,29 @@ export function LandingFooter() {
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {LINKS.map((col) => (
               <div key={col.title}>
-                <p className="text-[11.5px] font-bold uppercase tracking-[0.14em] text-faint">
+                <p className="text-[11.5px] font-bold uppercase tracking-[0.14em] text-mute">
                   {col.title}
                 </p>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {col.items.map((item) => (
-                    <li key={item}>
-                      <a
-                        href="#"
-                        className="text-[13.5px] font-medium text-mute transition-colors hover:text-ink"
-                      >
-                        {item}
-                      </a>
+                    <li key={item.label}>
+                      {item.isRoute ? (
+                        <Link
+                          to={item.href}
+                          className="text-[13.5px] font-medium text-mute transition-colors hover:text-ink"
+                        >
+                          {item.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href={item.href}
+                          target={item.isExternal ? '_blank' : undefined}
+                          rel={item.isExternal ? 'noopener noreferrer' : undefined}
+                          className="text-[13.5px] font-medium text-mute transition-colors hover:text-ink"
+                        >
+                          {item.label}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -93,13 +135,13 @@ export function LandingFooter() {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-edge pt-7 sm:flex-row">
-          <p className="text-[12.5px] font-medium text-faint">
+          <p className="text-[12.5px] font-medium text-mute">
             © 2026 TaskTrace, Inc. All rights reserved.
           </p>
-          <div className="flex gap-6 text-[12.5px] font-medium text-faint">
-            <a href="#" className="transition-colors hover:text-ink">Privacy</a>
-            <a href="#" className="transition-colors hover:text-ink">Terms</a>
-            <a href="#" className="transition-colors hover:text-ink">Security</a>
+          <div className="flex gap-6 text-[12.5px] font-medium text-mute">
+            <a href="#why" className="transition-colors hover:text-ink">Privacy</a>
+            <a href="#why" className="transition-colors hover:text-ink">Terms</a>
+            <a href="#pricing" className="transition-colors hover:text-ink">Security</a>
           </div>
         </div>
       </div>

@@ -531,7 +531,7 @@ const FEATURES: Feature[] = [
 
 export function FeatureShowcase() {
   return (
-    <section id="features" className="relative overflow-hidden py-20 sm:py-28 lg:py-36">
+    <section id="features" className="relative overflow-hidden py-20 sm:py-24 lg:py-32 scroll-mt-24">
       <div className="lp-blob right-[-15%] top-24 h-[520px] w-[520px]" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--accent) 9%, transparent), transparent 65%)' }} />
       <div className="lp-noise" />
 

@@ -5,6 +5,7 @@ import {
 } from '../api/boardApi';
 import { Mail, Check, X, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { showToast } from './ToastNotification';
 
 export const PendingInvitationsBanner: React.FC = () => {
   const { data, isLoading } = useGetPendingInvitationsQuery();
@@ -17,8 +18,17 @@ export const PendingInvitationsBanner: React.FC = () => {
   const handleRespond = async (invitationId: string, action: 'accept' | 'decline') => {
     try {
       await respondInvitation({ invitationId, action }).unwrap();
+      showToast({
+        type: 'BOARD_INVITATION',
+        title: action === 'accept' ? 'Invitation Accepted' : 'Invitation Declined',
+        message: action === 'accept' ? 'You joined the board.' : 'Invitation declined.',
+      });
     } catch (err: any) {
-      alert(err.data?.message || 'Failed to respond to invitation');
+      showToast({
+        type: 'GENERAL',
+        title: 'Error',
+        message: err.data?.message || 'Failed to respond to invitation',
+      });
     }
   };
 
@@ -33,7 +43,7 @@ export const PendingInvitationsBanner: React.FC = () => {
             className="w-8 h-8 rounded-full flex items-center justify-center border"
             style={{ background: 'color-mix(in srgb, var(--accent) 14%, transparent)', color: 'var(--accent)', borderColor: 'color-mix(in srgb, var(--accent) 24%, transparent)' }}
           >
-            <Bell className="w-4 h-4 animate-bounce" />
+            <Bell className="w-4 h-4" />
           </div>
           <span>
             You have{' '}

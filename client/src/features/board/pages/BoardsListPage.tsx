@@ -1,19 +1,59 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetBoardsQuery, useCreateBoardMutation } from '../../../api/boardApi';
-import { Plus, LayoutGrid, Users, Calendar, ArrowRight, X } from 'lucide-react';
+import { useGetBoardsQuery, useCreateBoardMutation, useDeleteBoardMutation } from '../../../api/boardApi';
+import { Plus, LayoutGrid, Users, Calendar, ArrowRight, X, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { showToast } from '../../../components/ToastNotification';
+import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
 import type { Board } from '../../../types';
 
 export const BoardsListPage: React.FC = () => {
   const { data, isLoading, error } = useGetBoardsQuery();
   const [createBoard, { isLoading: isCreating }] = useCreateBoardMutation();
+  const [deleteBoard, { isLoading: isDeletingBoard }] = useDeleteBoardMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [boardToDelete, setBoardToDelete] = useState<Board | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [createError, setCreateError] = useState('');
+
+  React.useEffect(() => {
+    if (!isModalOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen]);
+
+  const handleConfirmDeleteBoard = async () => {
+    if (!boardToDelete) return;
+    try {
+      await deleteBoard(boardToDelete._id).unwrap();
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Board Deleted',
+        message: `Board "${boardToDelete.name}" deleted successfully`,
+      });
+      setBoardToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete board', err);
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Delete Failed',
+        message: 'Failed to delete board',
+      });
+    }
+  };
 
   const handleCreateBoard = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +147,21 @@ export const BoardsListPage: React.FC = () => {
                   <h2 className="text-card-title text-xl font-bold text-ink line-clamp-1">
                     {board.name}
                   </h2>
-                  <ArrowRight className="w-5 h-5 text-faint group-hover:text-accent group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                  <div className="flex items-center space-x-1.5 shrink-0 ml-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setBoardToDelete(board);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
+                      title="Delete Board"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <ArrowRight className="w-5 h-5 text-faint group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                  </div>
                 </div>
 
                 <p className="text-body text-sm text-mute mb-6 line-clamp-2 min-h-[2.5rem]">
@@ -133,13 +187,17 @@ export const BoardsListPage: React.FC = () => {
 
       <AnimatePresence>
         {isModalOpen && (
-          <div className="modal-scrim">
+          <div
+            className="modal-scrim cursor-pointer"
+            onClick={() => setIsModalOpen(false)}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.94, y: 14 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 14 }}
               transition={{ duration: 0.28, ease: [0.22, 0.8, 0.32, 1] }}
-              className="w-full max-w-md modal-panel p-6 relative"
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md modal-panel p-6 relative cursor-default"
             >
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -193,6 +251,15 @@ export const BoardsListPage: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      <ConfirmDeleteModal
+        isOpen={Boolean(boardToDelete)}
+        title={`Delete "${boardToDelete?.name}"?`}
+        message="This will permanently delete this board, all of its columns, and associated tasks for all members. This action cannot be undone."
+        isLoading={isDeletingBoard}
+        onConfirm={handleConfirmDeleteBoard}
+        onCancel={() => setBoardToDelete(null)}
+      />
     </div>
   );
 };

@@ -95,9 +95,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   return (
-    <div className="border border-slate-700/80 rounded-xl overflow-hidden bg-slate-900 focus-within:border-indigo-500 transition-all">
+    <div className="border border-edge rounded-xl overflow-hidden bg-surface focus-within:border-accent transition-all">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 p-2 bg-slate-900/90 border-b border-slate-800 text-slate-300">
+      <div className="flex flex-wrap items-center gap-1 p-2 bg-surface border-b border-edge text-mute">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -236,7 +236,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       </div>
 
       {/* Editor Content Area */}
-      <div className="p-3 min-h-[140px] text-sm text-slate-100 prose prose-invert max-w-none focus:outline-none">
+      <div className="p-3 min-h-[140px] text-sm text-ink max-w-none focus:outline-none">
         <EditorContent editor={editor} />
       </div>
     </div>

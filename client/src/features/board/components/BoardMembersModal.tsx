@@ -23,6 +23,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
+import { showToast } from '../../../components/ToastNotification';
 
 interface BoardMembersModalProps {
   board: Board;
@@ -63,15 +65,28 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleRegenerateLink = async () => {
-    if (confirm('Regenerating will revoke the current share link. Continue?')) {
-      try {
-        await regenerateInviteCode(board._id).unwrap();
-        setSuccessMsg('Share link regenerated successfully!');
-        setTimeout(() => setSuccessMsg(''), 2000);
-      } catch (err: any) {
-        alert(err.data?.message || 'Failed to regenerate share link');
-      }
+  const [memberToKick, setMemberToKick] = useState<{ id: string; name: string } | null>(null);
+  const [isRegenerateConfirmOpen, setIsRegenerateConfirmOpen] = useState(false);
+
+  const handleRegenerateLink = () => {
+    setIsRegenerateConfirmOpen(true);
+  };
+
+  const handleConfirmRegenerate = async () => {
+    try {
+      await regenerateInviteCode(board._id).unwrap();
+      showToast({
+        type: 'TASK_UPDATED',
+        title: 'Link Regenerated',
+        message: 'The previous share link has been revoked.',
+      });
+      setIsRegenerateConfirmOpen(false);
+    } catch (err: any) {
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Error',
+        message: err.data?.message || 'Failed to regenerate share link',
+      });
     }
   };
 
@@ -95,13 +110,22 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
     }
   };
 
-  const handleKickMember = async (memberId: string, memberName: string) => {
-    if (confirm(`Kick ${memberName} from this board?`)) {
-      try {
-        await removeMember({ boardId: board._id, memberId }).unwrap();
-      } catch (err: any) {
-        alert(err.data?.message || 'Failed to kick member');
-      }
+  const handleConfirmKick = async () => {
+    if (!memberToKick) return;
+    try {
+      await removeMember({ boardId: board._id, memberId: memberToKick.id }).unwrap();
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Member Removed',
+        message: `${memberToKick.name} was removed from the board.`,
+      });
+      setMemberToKick(null);
+    } catch (err: any) {
+      showToast({
+        type: 'TASK_DELETED',
+        title: 'Error',
+        message: err.data?.message || 'Failed to remove member',
+      });
     }
   };
 
@@ -227,7 +251,7 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
                     <div key={member._id} className="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800">
                       <div className="flex items-center space-x-3">
                         <div className="relative">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xs">
+                          <div className="w-9 h-9 rounded-full bg-slate-800 border border-white/10 text-white flex items-center justify-center font-bold text-xs shadow-sm">
                             {member.name ? member.name[0].toUpperCase() : 'M'}
                           </div>
                           <span
@@ -247,9 +271,9 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
                         {isOwner && (
                           <button
                             type="button"
-                            onClick={() => handleKickMember(member._id, member.name)}
+                            onClick={() => setMemberToKick({ id: member._id, name: member.name })}
                             disabled={isRemoving}
-                            className="flex items-center space-x-1 px-2.5 py-1 text-xs text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-rose-500/20"
+                            className="flex items-center space-x-1 px-2.5 py-1 text-xs text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-rose-500/20 cursor-pointer"
                             title="Kick Member from Board"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -419,6 +443,27 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
           )}
         </div>
       </motion.div>
+
+      <ConfirmDeleteModal
+        isOpen={!!memberToKick}
+        title="Remove Member?"
+        itemName={memberToKick?.name}
+        message={`Are you sure you want to remove "${memberToKick?.name}" from this board? They will lose access to all tasks and activity.`}
+        confirmLabel="Remove Member"
+        isLoading={isRemoving}
+        onConfirm={handleConfirmKick}
+        onCancel={() => setMemberToKick(null)}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={isRegenerateConfirmOpen}
+        title="Regenerate Share Link?"
+        message="Regenerating will immediately revoke the current share link. Anyone with the old link will no longer be able to join."
+        confirmLabel="Regenerate Link"
+        isLoading={isRegenerating}
+        onConfirm={handleConfirmRegenerate}
+        onCancel={() => setIsRegenerateConfirmOpen(false)}
+      />
     </div>
   );
 };

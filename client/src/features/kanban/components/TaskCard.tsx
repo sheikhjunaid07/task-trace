@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task, User, Column } from "../../../types";
 import { useAppDispatch } from "../../../app/hooks";
 import { setActiveTaskId } from "../../board/boardSlice";
-import { useDeleteTaskMutation } from "../../../api/taskApi";
 import {
   MessageSquare,
-  Trash2,
   User as UserIcon,
   Check,
   Move,
@@ -15,8 +13,6 @@ import {
 } from "lucide-react";
 import { TypingIndicator } from "./TypingIndicator";
 import { priorityLabel } from "../../../utils/columnTheming";
-import { showToast } from "../../../components/ToastNotification";
-import { ConfirmDeleteModal } from "../../../components/ConfirmDeleteModal";
 import type {
   TypingUser,
   DraggingUser,
@@ -77,13 +73,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   currentColumn,
   columns = [],
-  boardId,
   typingUsers,
   draggingUser,
   isOverlay = false,
 }) => {
   const dispatch = useAppDispatch();
-  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
 
   const {
     attributes,
@@ -126,37 +120,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     dispatch(setActiveTaskId(task._id));
   };
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const resolvedBoardId =
-    boardId ||
-    (typeof task.board === 'string' ? task.board : (task.board as any)?._id) ||
-    '';
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setIsConfirmOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      await deleteTask({ taskId: task._id, boardId: resolvedBoardId }).unwrap();
-      showToast({
-        type: 'TASK_DELETED',
-        title: 'Task Deleted',
-        message: `Task "${task.title}" deleted`,
-      });
-      setIsConfirmOpen(false);
-    } catch (err) {
-      console.error('Failed to delete task:', err);
-      showToast({
-        type: 'TASK_DELETED',
-        title: 'Delete Failed',
-        message: 'Failed to delete task',
-      });
-    }
-  };
-
   const getPriorityStyle = (priority?: string) => {
     switch (priority) {
       case "critical":
@@ -164,7 +127,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       case "high":
         return "border-amber-500/40 bg-amber-500/15 text-amber-400";
       case "medium":
-        return "border-indigo-500/40 bg-indigo-500/15 text-indigo-300";
+        return "border-sky-500/40 bg-sky-500/15 text-sky-400";
       case "low":
         return "border-slate-600/40 bg-slate-700/25 text-slate-400";
       default:
@@ -254,7 +217,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   <div
                     key={user._id || idx}
                     title={user.name}
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white border border-[#16171d] shadow-sm shrink-0 ${getAvatarColorClass(
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white border border-slate-900 shadow-sm shrink-0 ${getAvatarColorClass(
                       user.name,
                       idx,
                     )}`}
@@ -271,7 +234,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   </div>
                 ))}
                 {assignees.length > 3 && (
-                  <div className="w-5 h-5 rounded-full bg-slate-800 border border-[#16171d] flex items-center justify-center text-[9px] font-bold text-slate-300 shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-slate-800 border border-slate-900 flex items-center justify-center text-[9px] font-bold text-slate-300 shrink-0">
                     +{assignees.length - 3}
                   </div>
                 )}
@@ -293,48 +256,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               </span>
             </div>
           )}
-
-          {/* Comment Count / Button */}
-          <button
-            type="button"
-            onClick={handleCommentClick}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="flex items-center space-x-1 text-slate-400 hover:text-white px-1.5 py-0.5 rounded hover:bg-white/5 transition-colors cursor-pointer shrink-0"
-            title={`${task.commentCount ?? 0} Comments (Click to view)`}
-          >
-            <MessageSquare className="w-3 h-3" />
-            <span className="text-[11px] font-semibold">
-              {task.commentCount ?? 0}
-            </span>
-          </button>
         </div>
 
-        {/* Delete Option (Positioned directly below the Due Date) */}
+        {/* Comment Count / Button */}
         <button
           type="button"
-          onClick={handleDeleteClick}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-          }}
-          disabled={isDeleting}
-          className="p-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-all cursor-pointer shrink-0 disabled:opacity-50"
-          title="Delete task"
+          onClick={handleCommentClick}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="flex items-center space-x-1.5 text-slate-400 hover:text-white px-2 py-1 rounded-md hover:bg-white/5 transition-colors cursor-pointer shrink-0"
+          title={`${task.commentCount ?? 0} Comments (Click to view)`}
         >
-          <Trash2 className="w-3.5 h-3.5" />
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span className="text-[11px] font-semibold">
+            {task.commentCount ?? 0}
+          </span>
         </button>
       </div>
-
-      <ConfirmDeleteModal
-        isOpen={isConfirmOpen}
-        title="Are you want to delete?"
-        itemName={task.title}
-        isLoading={isDeleting}
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setIsConfirmOpen(false)}
-      />
     </div>
   );
 };

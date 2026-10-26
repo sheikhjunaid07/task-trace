@@ -54,7 +54,7 @@ const COLUMNS = [
 
 export function ProductShowcase() {
   return (
-    <section id="product" className="relative overflow-hidden py-20 sm:py-28 lg:py-36">
+    <section id="product" className="relative overflow-hidden py-20 sm:py-24 lg:py-32 scroll-mt-24">
       <div className="lp-blob left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2" style={{ background: 'radial-gradient(ellipse, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%)' }} />
       <div className="lp-noise" />
 
@@ -88,7 +88,7 @@ export function ProductShowcase() {
                     <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e]/70" />
                   </div>
                   <div className="mx-auto flex w-full max-w-sm items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--bg)_60%,transparent)] px-3.5 py-1.5">
-                    <span className="flex h-3 w-3 items-center justify-center rounded-full text-white" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)', color: '#ffffff' }}>
+                    <span className="flex h-3 w-3 items-center justify-center rounded-full text-white" style={{ background: 'var(--grad-accent)', color: '#ffffff' }}>
                       <Kanban className="h-2 w-2" strokeWidth={3} style={{ color: '#ffffff', stroke: '#ffffff' }} />
                     </span>
                     <span className="text-[10px] font-medium text-faint">tasktrace.app/acme/product-launch</span>
@@ -104,7 +104,7 @@ export function ProductShowcase() {
                   {/* ── sidebar ── */}
                   <div className="hidden w-44 shrink-0 flex-col border-r border-edge p-3 md:flex">
                     <div className="mb-4 flex items-center gap-2 px-1.5">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-lg text-white" style={{ background: 'linear-gradient(135deg,#8b5cf6,#a855f7)', color: '#ffffff' }}>
+                      <span className="flex h-6 w-6 items-center justify-center rounded-lg text-white" style={{ background: 'var(--grad-accent)', color: '#ffffff' }}>
                         <Kanban className="h-3 w-3" strokeWidth={2.6} style={{ color: '#ffffff', stroke: '#ffffff' }} />
                       </span>
                       <span className="text-[11px] font-extrabold tracking-tight text-ink">TaskTrace</span>
