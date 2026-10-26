@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import type { Task, User, Column } from '../../../types';
 import { useUpdateTaskMutation, useDeleteTaskMutation, useArchiveTaskMutation } from '../../../api/taskApi';
 import { useAppDispatch } from '../../../app/hooks';
@@ -6,11 +6,14 @@ import { setActiveTaskId } from '../../board/boardSlice';
 import { X, Trash2, Archive, User as UserIcon } from 'lucide-react';
 import { CommentSection } from './CommentSection';
 import { TypingIndicator } from './TypingIndicator';
-import { RichTextEditor } from '../../../components/RichTextEditor';
-import { showToast } from '../../../components/ToastNotification';
+import { showToast } from '../../../utils/toast';
 import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
 import type { TypingUser } from '../../../sockets/useSocketEvents';
 import { motion } from 'framer-motion';
+
+const RichTextEditor = lazy(() =>
+  import('../../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor }))
+);
 
 interface TaskModalProps {
   task: Task;
@@ -173,7 +176,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm cursor-pointer"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/80 backdrop-blur-sm cursor-pointer"
       onClick={handleCloseAttempt}
     >
       <motion.div
@@ -184,7 +187,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl max-h-[90vh] glass-card rounded-2xl p-6 border border-white/10 shadow-2xl overflow-y-auto relative flex flex-col cursor-default"
+        className="w-full max-w-2xl max-h-[92vh] glass-card rounded-2xl p-4 sm:p-6 border border-white/10 shadow-2xl overflow-y-auto relative flex flex-col cursor-default"
         style={{ backgroundColor: 'var(--surface, #14151a)' }}
       >
         {/* Modal Header */}
@@ -248,13 +251,21 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             <label className="block text-xs font-semibold text-mute uppercase tracking-wider mb-1">
               Formattable Description (@Member Tagging & Cloudinary Uploads)
             </label>
-            <RichTextEditor
-              content={description}
-              onChange={(html) => setDescription(html)}
-              onTypingStart={() => onTypingStart(task._id)}
-              onTypingStop={() => onTypingStop(task._id)}
-              members={members}
-            />
+            <Suspense
+              fallback={
+                <div className="h-36 w-full rounded-xl bg-surface/50 border border-edge animate-pulse flex items-center justify-center text-xs text-mute font-medium">
+                  Loading editor...
+                </div>
+              }
+            >
+              <RichTextEditor
+                content={description}
+                onChange={(html) => setDescription(html)}
+                onTypingStart={() => onTypingStart(task._id)}
+                onTypingStop={() => onTypingStop(task._id)}
+                members={members}
+              />
+            </Suspense>
           </div>
 
           {/* Priority & Column & Due Date Grid */}
@@ -337,7 +348,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-white/10 mt-auto">
           <div className="flex items-center space-x-2">
             <button
               type="button"
@@ -373,11 +384,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </button>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-end space-x-2 sm:space-x-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleCloseAttempt}
-              className="px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/10 cursor-pointer flex items-center space-x-1.5 transition-colors"
+              className="flex-1 sm:flex-none justify-center px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/10 cursor-pointer flex items-center space-x-1.5 transition-colors"
             >
               <span>{isDirty ? 'Discard' : 'Cancel'}</span>
               <span className="hidden sm:inline-block text-[10px] font-mono opacity-50 px-1 py-0.5 rounded bg-white/5 border border-white/10">Esc</span>
@@ -386,7 +397,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               type="button"
               onClick={handleSave}
               disabled={isUpdating}
-              className="btn btn-primary px-4 py-2 text-xs flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+              className="flex-1 sm:flex-none justify-center btn btn-primary px-4 py-2 text-xs flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
             >
               <span>{isUpdating ? 'Saving...' : 'Save Changes'}</span>
               <span className="hidden sm:inline-block text-[10px] font-mono opacity-80 px-1.5 py-0.5 rounded bg-black/25">⌘↵</span>

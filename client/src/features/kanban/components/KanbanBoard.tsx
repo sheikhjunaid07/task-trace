@@ -33,7 +33,7 @@ import {
 } from "../../../api/boardApi";
 import { Plus, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { showToast } from "../../../components/ToastNotification";
+import { showToast } from "../../../utils/toast";
 import type { TypingUser, DraggingUser } from "../../../sockets/useSocketEvents";
 
 interface KanbanBoardProps {
@@ -296,7 +296,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       onDragCancel={handleDragCancel}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-6 h-[calc(100vh-14rem)] items-start">
+      <div className="flex gap-3 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-6 min-h-[460px] h-[calc(100dvh-17.5rem)] sm:h-[calc(100vh-14rem)] items-start overscroll-x-contain touch-pan-x">
         <SortableContext
           items={columnIdList}
           strategy={horizontalListSortingStrategy}
@@ -321,7 +321,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         </SortableContext>
 
         {/* Add Column Button / Card */}
-        <div className="w-[85vw] sm:w-80 shrink-0 snap-start">
+        <div className="w-[84vw] max-w-[340px] sm:w-80 shrink-0 snap-start">
           {isAddingColumnForm ? (
             <motion.form
               initial={{ opacity: 0, scale: 0.95 }}

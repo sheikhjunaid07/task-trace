@@ -87,9 +87,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 mb-6 glass-panel p-3 rounded-2xl border border-white/10">
       {/* Left side: Search input & My Tasks toggle */}
-      <div className="flex items-center space-x-2.5 flex-1 min-w-[280px]">
+      <div className="flex items-center space-x-2 sm:space-x-2.5 w-full sm:w-auto sm:flex-1 min-w-0">
         {/* Search Field */}
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative flex-1 min-w-0 sm:max-w-xs">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           <input
             ref={searchInputRef}
@@ -106,7 +106,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               }
             }}
             placeholder="Search tasks..."
-            className="input pl-10 pr-9 py-2 text-[13px] text-white placeholder:text-slate-400 font-medium bg-white/5 border-white/15 focus:border-white/30"
+            className="input pl-10 pr-9 py-2 text-[13px] text-white placeholder:text-slate-400 font-medium bg-white/5 border-white/15 focus:border-white/30 w-full"
           />
           {searchQuery ? (
             <button
@@ -132,7 +132,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <button
             type="button"
             onClick={toggleMyTasks}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
+            className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
               isMyTasksActive
                 ? "bg-accent/20 border-accent/40 text-accent shadow-sm"
                 : "glass-panel bg-white/5 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
@@ -140,7 +140,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             title="Toggle only tasks assigned to me (Shortcut: M)"
           >
             <UserCheck className="w-3.5 h-3.5" />
-            <span>My Tasks</span>
+            <span className="hidden xs:inline sm:inline">My Tasks</span>
+            <span className="xs:hidden sm:hidden">Mine</span>
             <kbd className="hidden sm:inline-block text-[9px] font-mono opacity-60 px-1 py-0.2 rounded bg-black/25 ml-0.5">
               M
             </kbd>
@@ -161,14 +162,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       </div>
 
       {/* Right side: Priority, Assignee Dropdowns, Reset, & Shortcuts */}
-      <div className="flex items-center space-x-2.5 flex-wrap gap-y-2">
+      <div className="flex items-center space-x-2 sm:space-x-2.5 w-full sm:w-auto flex-wrap gap-y-2">
         {/* Priority Filter */}
-        <div className="flex items-center space-x-2 glass-panel rounded-xl px-3 py-2 border border-white/10 bg-white/5">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
+        <div className="flex items-center space-x-2 glass-panel rounded-xl px-2.5 sm:px-3 py-2 border border-white/10 bg-white/5 flex-1 sm:flex-none min-w-[120px]">
+          <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <select
             value={priorityFilter}
             onChange={(e) => dispatch(setPriorityFilter(e.target.value as any))}
-            className="bg-transparent text-xs font-semibold cursor-pointer text-white focus:outline-none"
+            className="bg-transparent text-xs font-semibold cursor-pointer text-white focus:outline-none w-full"
           >
             <option value="all" className="bg-slate-900 text-white">
               All Priorities
@@ -189,12 +190,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </div>
 
         {/* Assignee Filter */}
-        <div className="flex items-center space-x-2 glass-panel rounded-xl px-3 py-2 border border-white/10 bg-white/5">
-          <UserIcon className="w-3.5 h-3.5 text-slate-400" />
+        <div className="flex items-center space-x-2 glass-panel rounded-xl px-2.5 sm:px-3 py-2 border border-white/10 bg-white/5 flex-1 sm:flex-none min-w-[120px]">
+          <UserIcon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <select
             value={assigneeFilter}
             onChange={(e) => dispatch(setAssigneeFilter(e.target.value))}
-            className="bg-transparent text-xs font-semibold cursor-pointer text-white focus:outline-none"
+            className="bg-transparent text-xs font-semibold cursor-pointer text-white focus:outline-none w-full"
           >
             <option value="all" className="bg-slate-900 text-white">
               All Assignees

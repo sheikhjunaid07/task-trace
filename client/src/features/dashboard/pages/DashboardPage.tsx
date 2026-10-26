@@ -21,7 +21,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { UpcomingDeadlines } from '../components/UpcomingDeadlines';
-import { showToast } from '../../../components/ToastNotification';
+import { showToast } from '../../../utils/toast';
 
 export const DashboardPage: React.FC = () => {
   const currentUser = useAppSelector((state) => state.auth.user);
@@ -116,16 +116,16 @@ export const DashboardPage: React.FC = () => {
   const isLoading = isStatsLoading && isBoardsLoading;
 
   return (
-    <div className="min-h-full px-4 sm:px-8 py-8 max-w-7xl mx-auto space-y-8 select-none">
+    <div className="min-h-full px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 select-none">
       {/* ─── Header: Dynamic Project Title & + New Project ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-ink">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 flex-wrap gap-y-1">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-ink truncate max-w-[260px] xs:max-w-xs sm:max-w-md">
               {displayTitle}
             </h1>
             <span
-              className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+              className={`px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
                 isUserAdmin
                   ? 'bg-purple-600/25 text-purple-200 border border-purple-500/40'
                   : 'bg-blue-600/20 text-blue-200 border border-blue-500/35'
@@ -134,14 +134,14 @@ export const DashboardPage: React.FC = () => {
               {isUserAdmin ? 'ADMIN' : 'MEMBER'}
             </span>
           </div>
-          <p className="text-sm text-mute font-medium mt-1">
+          <p className="text-xs sm:text-sm text-mute font-medium mt-1">
             {currentBoard?.description || 'Collaborative team workspace and project management.'}
           </p>
         </div>
 
         <button
           onClick={() => setIsNewProjectModalOpen(true)}
-          className="btn btn-primary self-start sm:self-auto cursor-pointer"
+          className="btn btn-primary self-start sm:self-auto cursor-pointer text-xs sm:text-sm py-2 sm:py-2.5"
         >
           <Plus className="w-4 h-4" />
           <span>New Project</span>
@@ -149,11 +149,11 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* ─── Row 1: 3 Metric Cards ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-5">
         {/* Card 1: Active Projects */}
-        <div className="glass-card card-lift p-6 flex items-center justify-between shadow-sm border border-edge">
+        <div className="glass-card card-lift p-4 sm:p-6 flex items-center justify-between shadow-sm border border-edge">
           <div>
-            <div className="text-4xl font-extrabold text-ink tracking-tight">
+            <div className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">
               {isLoading ? (
                 <div className="h-9 w-12 skeleton rounded" />
               ) : (

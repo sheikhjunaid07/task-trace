@@ -23,7 +23,7 @@ import {
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { setSelectedProjectId } from '../../board/boardSlice';
 import type { BoardLabel, Column, Task } from '../../../types';
-import { showToast } from '../../../components/ToastNotification';
+import { showToast } from '../../../utils/toast';
 import {
   Sliders,
   Users,
@@ -110,7 +110,6 @@ export const ProjectSettingsPage: React.FC = () => {
   // Metadata form state
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
-  const [projectIcon, setProjectIcon] = useState('🚀');
   const [projectColor, setProjectColor] = useState('#8b5cf6');
   const [projectAvatarUrl, setProjectAvatarUrl] = useState('');
   const [projectVisibility, setProjectVisibility] = useState<'public' | 'private'>('private');
@@ -142,7 +141,6 @@ export const ProjectSettingsPage: React.FC = () => {
     if (board) {
       setProjectName(board.name || board.title || '');
       setProjectDescription(board.description || '');
-      setProjectIcon(board.icon || '🚀');
       setProjectColor(board.color || '#8b5cf6');
       setProjectAvatarUrl(board.avatarUrl || '');
       setProjectVisibility(board.visibility || 'private');
@@ -173,7 +171,6 @@ export const ProjectSettingsPage: React.FC = () => {
         name: projectName.trim(),
         title: projectName.trim(),
         description: projectDescription.trim(),
-        icon: projectIcon,
         color: projectColor,
         avatarUrl: projectAvatarUrl.trim() || null,
         visibility: projectVisibility,
@@ -519,12 +516,12 @@ export const ProjectSettingsPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <div className="flex items-center space-x-2.5">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight truncate max-w-md">
+            <div className="flex items-center space-x-2.5 flex-wrap gap-y-1">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-white tracking-tight truncate max-w-[200px] xs:max-w-xs sm:max-w-md">
                 {board.name || board.title}
               </h1>
               <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${
                   isCurrentOwner
                     ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                     : isCurrentAdmin
@@ -541,12 +538,12 @@ export const ProjectSettingsPage: React.FC = () => {
 
         {/* Project Switcher Dropdown if user has multiple boards */}
         {boards.length > 1 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-xs text-mute font-medium">Switch Project:</span>
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <span className="text-xs text-mute font-medium shrink-0">Switch Project:</span>
             <select
               value={board._id}
               onChange={(e) => navigate(`/boards/${e.target.value}/settings`)}
-              className="bg-surface border border-edge text-xs font-semibold text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-purple-400 cursor-pointer"
+              className="bg-surface border border-edge text-xs font-semibold text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-purple-400 cursor-pointer flex-1 sm:flex-none max-w-full"
             >
               {boards.map((b) => (
                 <option key={b._id} value={b._id}>

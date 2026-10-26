@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useGetBoardsQuery, useCreateBoardMutation } from '../api/boardApi';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { setMobileMenuOpen } from '../features/board/boardSlice';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -13,11 +14,13 @@ import {
   Settings,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { showToast } from './ToastNotification';
+import { showToast } from '../utils/toast';
 
 export const LeftSidebar: React.FC = () => {
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const selectedProjectId = useAppSelector((state) => state.board.selectedProjectId);
+  const isMobileMenuOpen = useAppSelector((state) => state.board.isMobileMenuOpen);
   const user = useAppSelector((state) => state.auth.user);
   const { data: boardsData } = useGetBoardsQuery();
   const [createBoard, { isLoading: isCreating }] = useCreateBoardMutation();
@@ -28,7 +31,7 @@ export const LeftSidebar: React.FC = () => {
       if (saved !== null) {
         return saved === 'true';
       }
-      return window.innerWidth < 768;
+      return false;
     }
     return false;
   });
@@ -58,14 +61,8 @@ export const LeftSidebar: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsCollapsed(true);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    dispatch(setMobileMenuOpen(false));
+  }, [location.pathname, dispatch]);
 
   const handleCreateBoard = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +90,9 @@ export const LeftSidebar: React.FC = () => {
 
   return (
     <>
+      {/* ── Desktop Inline Sidebar ── */}
       <aside
-        className={`glass-panel border-r border-edge border-t-0 border-b-0 border-l-0 text-ink min-h-[calc(100vh-4rem)] transition-all duration-300 flex flex-col z-30 select-none ${
+        className={`hidden md:flex glass-panel border-r border-edge border-t-0 border-b-0 border-l-0 text-ink min-h-[calc(100vh-4rem)] transition-all duration-300 flex-col z-30 select-none ${
           isCollapsed ? 'w-16' : 'w-64'
         }`}
       >
@@ -277,6 +275,182 @@ export const LeftSidebar: React.FC = () => {
           )}
         </div>
       </aside>
+
+      {/* ── Mobile Off-Canvas Drawer ── */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            {/* Backdrop Scrim */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => dispatch(setMobileMenuOpen(false))}
+              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+            />
+
+            {/* Slide-over Drawer Panel */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-72 max-w-[85vw] h-full bg-card/95 backdrop-blur-2xl border-r border-edge flex flex-col p-4 shadow-2xl z-10"
+            >
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-edge">
+                <div className="min-w-0 pr-2">
+                  <span className="text-[10px] font-bold tracking-wider text-slate-300 uppercase block">
+                    CURRENT PROJECT
+                  </span>
+                  <h3 className="text-base font-bold text-ink truncate mt-0.5" title={currentProjectName}>
+                    {currentProjectName}
+                  </h3>
+                  <span className={`text-xs font-semibold ${isUserAdmin ? 'text-purple-400' : 'text-blue-500'}`}>
+                    Role: {isUserAdmin ? 'admin' : 'member'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => dispatch(setMobileMenuOpen(false))}
+                  className="icon-btn w-8 h-8 shrink-0"
+                  aria-label="Close navigation"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <nav className="flex-1 space-y-1.5 overflow-y-auto py-2">
+                <Link
+                  to="/dashboard"
+                  onClick={() => dispatch(setMobileMenuOpen(false))}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    isDashboardActive
+                      ? 'sidebar-nav-active font-bold shadow-sm'
+                      : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)]'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4 shrink-0" />
+                  <span>Dashboard</span>
+                </Link>
+
+                <Link
+                  to="/boards"
+                  onClick={() => dispatch(setMobileMenuOpen(false))}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    isProjectsActive && !isDashboardActive
+                      ? 'sidebar-nav-active font-bold shadow-sm'
+                      : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)]'
+                  }`}
+                >
+                  <FolderKanban className="w-4 h-4 shrink-0" />
+                  <span>Projects & Tasks</span>
+                </Link>
+
+                <Link
+                  to="/team"
+                  onClick={() => dispatch(setMobileMenuOpen(false))}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    isTeamActive
+                      ? 'sidebar-nav-active font-bold shadow-sm'
+                      : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)]'
+                  }`}
+                >
+                  <Users className="w-4 h-4 shrink-0" />
+                  <span>Team Members</span>
+                </Link>
+
+                <Link
+                  to={currentBoard ? `/boards/${currentBoard._id}/settings` : '/settings'}
+                  onClick={() => dispatch(setMobileMenuOpen(false))}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    isSettingsActive
+                      ? 'sidebar-nav-active font-bold shadow-sm'
+                      : 'text-mute hover:text-ink hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)]'
+                  }`}
+                >
+                  <Settings className="w-4 h-4 shrink-0" />
+                  <span>Settings</span>
+                </Link>
+              </nav>
+
+              {/* Create Board CTA */}
+              <div className="pt-3 border-t border-edge">
+                <button
+                  type="button"
+                  onClick={() => {
+                    dispatch(setMobileMenuOpen(false));
+                    setIsCreateModalOpen(true);
+                  }}
+                  className="btn btn-primary w-full py-2.5 text-xs font-bold flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create New Project</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Mobile Bottom Navigation Bar (Thumb Friendly) ── */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-xl border-t border-edge flex items-center justify-around h-15 px-2 select-none shadow-lg"
+      >
+        <Link
+          to="/dashboard"
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-2.5 rounded-xl transition-all ${
+            isDashboardActive ? 'text-accent font-bold scale-105' : 'text-mute hover:text-ink font-medium'
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          <span className="text-[10px]">Dashboard</span>
+        </Link>
+
+        <Link
+          to="/boards"
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-2.5 rounded-xl transition-all ${
+            isProjectsActive && !isDashboardActive ? 'text-accent font-bold scale-105' : 'text-mute hover:text-ink font-medium'
+          }`}
+        >
+          <FolderKanban className="w-4 h-4" />
+          <span className="text-[10px]">Projects</span>
+        </Link>
+
+        {/* Quick Create Action */}
+        <button
+          type="button"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-accent text-on-accent shadow-md -mt-3 border-2 border-surface active:scale-95 transition-transform"
+          title="Create New Project"
+          aria-label="Create New Project"
+        >
+          <Plus className="w-5 h-5" strokeWidth={2.5} />
+        </button>
+
+        <Link
+          to="/team"
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-2.5 rounded-xl transition-all ${
+            isTeamActive ? 'text-accent font-bold scale-105' : 'text-mute hover:text-ink font-medium'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span className="text-[10px]">Team</span>
+        </Link>
+
+        <Link
+          to={currentBoard ? `/boards/${currentBoard._id}/settings` : '/settings'}
+          className={`flex flex-col items-center justify-center gap-0.5 py-1 px-2.5 rounded-xl transition-all ${
+            isSettingsActive ? 'text-accent font-bold scale-105' : 'text-mute hover:text-ink font-medium'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span className="text-[10px]">Settings</span>
+        </Link>
+      </nav>
 
       {/* Create New Project Modal */}
       <AnimatePresence>

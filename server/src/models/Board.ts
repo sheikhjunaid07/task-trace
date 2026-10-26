@@ -23,7 +23,6 @@ export interface IMemberRole {
 export interface IBoard {
   name: string;
   description?: string;
-  icon?: string;
   color?: string;
   avatarUrl?: string;
   visibility?: "public" | "private";
@@ -67,7 +66,6 @@ const boardSchema = new Schema<IBoard>(
   {
     name: { type: String, required: true, trim: true, maxlength: 100 },
     description: { type: String, trim: true, maxlength: 500 },
-    icon: { type: String, default: "🚀" },
     color: { type: String, default: "#8b5cf6" },
     avatarUrl: { type: String, default: null },
     visibility: { type: String, enum: ["public", "private"], default: "private" },

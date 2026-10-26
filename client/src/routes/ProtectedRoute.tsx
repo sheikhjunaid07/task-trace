@@ -14,7 +14,7 @@ export const ProtectedRoute: React.FC = () => {
   return (
     <div className="flex flex-1 min-h-[calc(100vh-4rem)] max-w-full overflow-x-hidden">
       <LeftSidebar />
-      <div className="flex-1 min-w-0 overflow-x-hidden">
+      <div className="flex-1 min-w-0 overflow-x-hidden pb-16 md:pb-0">
         <Outlet />
       </div>
     </div>

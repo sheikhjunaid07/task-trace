@@ -21,23 +21,25 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({
   const members = board.members || [];
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b divider mb-6">
-      <div className="flex items-center space-x-4">
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-hero text-white font-extrabold">{board.name}</h1>
-            <span className="badge badge-success font-semibold text-white">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-5 border-b divider mb-4 sm:mb-6">
+      <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+        <div className="min-w-0">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 flex-wrap gap-y-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight truncate max-w-[240px] xs:max-w-xs sm:max-w-md">
+              {board.name}
+            </h1>
+            <span className="badge badge-success font-semibold text-white shrink-0">
               <Radio className="w-3 h-3 text-emerald-400" />
               <span>Realtime</span>
             </span>
           </div>
           {board.description && (
-            <p className="text-meta text-slate-200 font-medium mt-1.5 line-clamp-1">{board.description}</p>
+            <p className="text-xs sm:text-sm text-slate-200 font-medium mt-1 line-clamp-1">{board.description}</p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center space-x-3 flex-wrap gap-y-2">
+      <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap gap-y-2">
         <div className="flex items-center -space-x-1.5 glass-panel rounded-full px-2.5 py-1.5 border border-white/10">
           {members.map((member: User | any) => {
             const mId = typeof member === 'string' ? member : member._id;

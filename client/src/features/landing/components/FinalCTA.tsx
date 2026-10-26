@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowRight, CalendarClock } from 'lucide-react';
 import { Reveal } from './ui/Reveal';
 
@@ -47,7 +46,7 @@ export function FinalCTA() {
         style={{ background: 'color-mix(in srgb, var(--surface) 90%, var(--bg))' }}
       />
       {BLOBS.map((b, i) => (
-        <motion.div
+        <div
           key={i}
           className="lp-blob"
           style={{
@@ -56,12 +55,6 @@ export function FinalCTA() {
             top: b.top,
             left: b.left,
             background: `radial-gradient(circle, ${b.color}, transparent 62%)`,
-          }}
-          animate={{ x: [0, b.drift.x, 0], y: [0, b.drift.y, 0], scale: [1, 1.15, 1] }}
-          transition={{
-            duration: b.duration,
-            repeat: Infinity,
-            ease: 'easeInOut',
           }}
         />
       ))}

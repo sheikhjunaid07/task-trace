@@ -7,7 +7,7 @@ import { commentApi } from '../api/commentApi';
 import { activityApi } from '../api/activityApi';
 import type { Task } from '../types';
 import type { RootState } from '../app/store';
-import { showToast } from '../components/ToastNotification';
+import { showToast } from '../utils/toast';
 
 export type ConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
 

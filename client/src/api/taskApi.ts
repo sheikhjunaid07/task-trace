@@ -52,7 +52,6 @@ export const taskApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, { boardId }) => [
         { type: 'Task', id: `BOARD_${boardId}` },
         { type: 'Task', id: 'LIST' },
-        { type: 'Notification', id: 'LIST' },
       ],
     }),
     updateTask: builder.mutation<
@@ -101,7 +100,6 @@ export const taskApi = baseApi.injectEndpoints({
         { type: 'Task', id: taskId },
         { type: 'Task', id: `BOARD_${boardId}` },
         { type: 'Task', id: 'LIST' },
-        { type: 'Notification', id: 'LIST' },
       ],
     }),
     moveTask: builder.mutation<
@@ -150,7 +148,6 @@ export const taskApi = baseApi.injectEndpoints({
         { type: 'Task', id: taskId },
         { type: 'Task', id: `BOARD_${boardId}` },
         { type: 'Task', id: 'LIST' },
-        { type: 'Notification', id: 'LIST' },
       ],
     }),
     deleteTask: builder.mutation<{ statusCode: number; message: string }, { taskId: string; boardId: string; opId?: string }>({
@@ -182,7 +179,6 @@ export const taskApi = baseApi.injectEndpoints({
         { type: 'Task', id: taskId },
         { type: 'Task', id: `BOARD_${boardId}` },
         { type: 'Task', id: 'LIST' },
-        { type: 'Notification', id: 'LIST' },
       ],
     }),
     archiveTask: builder.mutation<

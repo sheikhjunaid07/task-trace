@@ -276,13 +276,13 @@ export const TeamMembersPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Refresh Button */}
           <button
             type="button"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            className="btn btn-ghost border border-edge text-xs flex items-center space-x-1.5 cursor-pointer"
+            className="btn btn-ghost border border-edge text-xs flex items-center justify-center space-x-1.5 cursor-pointer py-2 px-2.5 sm:px-3"
             title="Refresh members list"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-accent' : ''}`} />
@@ -293,7 +293,7 @@ export const TeamMembersPage: React.FC = () => {
           <button
             type="button"
             onClick={handleCopyLink}
-            className="btn btn-ghost border border-edge text-xs flex items-center space-x-2 cursor-pointer"
+            className="btn btn-ghost border border-edge text-xs flex-1 sm:flex-none justify-center flex items-center space-x-1.5 sm:space-x-2 cursor-pointer py-2 px-2.5 sm:px-3"
           >
             {copiedLink ? (
               <>
@@ -312,7 +312,7 @@ export const TeamMembersPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsInviteModalOpen(true)}
-            className="btn btn-primary text-xs flex items-center space-x-2 cursor-pointer shadow-sm"
+            className="btn btn-primary text-xs flex-1 sm:flex-none justify-center flex items-center space-x-1.5 sm:space-x-2 cursor-pointer shadow-sm py-2 px-3 sm:px-4"
           >
             <UserPlus className="w-4 h-4" />
             <span>Invite Member</span>
@@ -396,11 +396,11 @@ export const TeamMembersPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as any)}
-            className="input text-xs py-2 w-32 cursor-pointer"
+            className="input text-xs py-2 flex-1 sm:w-32 cursor-pointer"
           >
             <option value="all">All Roles</option>
             <option value="admin">Admins</option>
@@ -411,7 +411,7 @@ export const TeamMembersPage: React.FC = () => {
             <select
               value={projectFilter}
               onChange={(e) => setProjectFilter(e.target.value)}
-              className="input text-xs py-2 w-40 cursor-pointer"
+              className="input text-xs py-2 flex-1 sm:w-40 cursor-pointer"
             >
               <option value="all">All Projects</option>
               {boards.map((b) => (

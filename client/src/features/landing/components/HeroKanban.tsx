@@ -118,14 +118,7 @@ const TOASTS = [
 
 function Card({ task }: { task: KbTask }) {
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 22, scale: 0.92 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9, filter: 'blur(4px)' }}
-      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-      className="lp-kb-card px-3 py-2.5"
-    >
+    <div className="lp-kb-card px-3 py-2.5">
       <p className="line-clamp-2 text-[11.5px] font-semibold leading-snug text-ink">
         {task.title}
       </p>
@@ -164,9 +157,11 @@ function Card({ task }: { task: KbTask }) {
                     task.progress === 100
                       ? 'var(--success)'
                       : 'var(--accent)',
+                  width: `${task.progress}%`,
+                  transformOrigin: 'left',
                 }}
-                initial={{ width: 0 }}
-                whileInView={{ width: `${task.progress}%` }}
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.2, ease: 'easeOut' }}
               />
@@ -185,14 +180,14 @@ function Card({ task }: { task: KbTask }) {
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
 function Column({ id, tasks }: { id: ColId; tasks: KbTask[] }) {
   return (
     <div
-      className="lp-kb-col min-h-0 w-[78vw] max-w-[250px] shrink-0 snap-center rounded-xl bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] p-2 sm:w-auto sm:max-w-none sm:shrink sm:snap-align-none"
+      className="lp-kb-col min-h-0 w-[74vw] max-w-[240px] shrink-0 snap-center rounded-xl bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] p-2 sm:w-auto sm:max-w-none sm:shrink sm:snap-align-none"
       style={{ ['--col' as string]: COLORS[id] }}
     >
       <div className="mb-2 flex items-center justify-between px-1">
@@ -205,32 +200,25 @@ function Column({ id, tasks }: { id: ColId; tasks: KbTask[] }) {
         <span className="column-badge">{tasks.length}</span>
       </div>
 
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence initial={false}>
         <div className="flex flex-col gap-2">
           {tasks.map((t) => (
-            <motion.div key={t.id} layout>
-              <motion.div
-                animate={{ y: [0, -4, 0] }}
-                transition={{
-                  duration: 4 + (t.id.charCodeAt(1) % 3),
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: (t.id.charCodeAt(1) % 4) * 0.4,
-                }}
-              >
-                <Card task={t} />
-              </motion.div>
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, y: 12, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              <Card task={t} />
             </motion.div>
           ))}
           {id === 'inprogress' && tasks.length > 0 && (
-            <motion.div
-              layout
+            <div
               className="lp-kb-card-drag flex h-16 items-center justify-center text-[9px] font-medium text-faint"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
             >
               Drop to move · live sync
-            </motion.div>
+            </div>
           )}
         </div>
       </AnimatePresence>
@@ -241,7 +229,9 @@ function Column({ id, tasks }: { id: ColId; tasks: KbTask[] }) {
 export function HeroKanban() {
   const [cols, setCols] = useState<Record<ColId, KbTask[]>>(INITIAL);
   const [toast, setToast] = useState(0);
+  const [isDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
   const ref = useRef<HTMLDivElement>(null);
+  const rectRef = useRef<DOMRect | null>(null);
   const reduced = useReducedMotion();
 
   const mx = useMotionValue(0.5);
@@ -257,43 +247,55 @@ export function HeroKanban() {
 
   useEffect(() => {
     if (reduced) return;
-    const advance = setInterval(() => {
-      setCols((prev) => {
-        if (!prev.todo.length) {
-          if (!prev.inprogress.length && prev.done.length >= 3) {
-            return INITIAL;
+    let advance: ReturnType<typeof setInterval>;
+    let finish: ReturnType<typeof setInterval>;
+    const delayTimer = setTimeout(() => {
+      advance = setInterval(() => {
+        setCols((prev) => {
+          if (!prev.todo.length) {
+            if (!prev.inprogress.length && prev.done.length >= 3) {
+              return INITIAL;
+            }
+            return prev;
           }
-          return prev;
-        }
-        const task = prev.todo[0];
-        return {
-          todo: prev.todo.slice(1),
-          inprogress: [...prev.inprogress, task],
-          done: prev.done,
-        };
-      });
-    }, 3400);
-    const finish = setInterval(() => {
-      setCols((prev) => {
-        if (!prev.inprogress.length) return prev;
-        const task = prev.inprogress[0];
-        return {
-          todo: prev.todo,
-          inprogress: prev.inprogress.slice(1),
-          done: [...prev.done, task],
-        };
-      });
-    }, 5600);
+          const task = prev.todo[0];
+          return {
+            todo: prev.todo.slice(1),
+            inprogress: [...prev.inprogress, task],
+            done: prev.done,
+          };
+        });
+      }, 4200);
+      finish = setInterval(() => {
+        setCols((prev) => {
+          if (!prev.inprogress.length) return prev;
+          const task = prev.inprogress[0];
+          return {
+            todo: prev.todo,
+            inprogress: prev.inprogress.slice(1),
+            done: [...prev.done, task],
+          };
+        });
+      }, 6400);
+    }, 5500);
+
     return () => {
-      clearInterval(advance);
-      clearInterval(finish);
+      clearTimeout(delayTimer);
+      if (advance) clearInterval(advance);
+      if (finish) clearInterval(finish);
     };
-  }, []);
+  }, [reduced]);
 
   useEffect(() => {
     if (reduced) return;
-    const t = setInterval(() => setToast((v) => (v + 1) % TOASTS.length), 5200);
-    return () => clearInterval(t);
+    let t: ReturnType<typeof setInterval>;
+    const delayTimer = setTimeout(() => {
+      t = setInterval(() => setToast((v) => (v + 1) % TOASTS.length), 5500);
+    }, 6000);
+    return () => {
+      clearTimeout(delayTimer);
+      if (t) clearInterval(t);
+    };
   }, [reduced]);
 
   const totalTasks = cols.todo.length + cols.inprogress.length + cols.done.length;
@@ -301,23 +303,33 @@ export function HeroKanban() {
   return (
     <div
       ref={ref}
+      onPointerEnter={() => {
+        if (ref.current) {
+          rectRef.current = ref.current.getBoundingClientRect();
+        }
+      }}
       onPointerMove={(e) => {
         if (e.pointerType === 'touch') return;
-        const r = ref.current?.getBoundingClientRect();
-        if (!r) return;
+        let r = rectRef.current;
+        if (!r && ref.current) {
+          r = ref.current.getBoundingClientRect();
+          rectRef.current = r;
+        }
+        if (!r || !r.width || !r.height) return;
         mx.set((e.clientX - r.left) / r.width);
         my.set((e.clientY - r.top) / r.height);
       }}
       onPointerLeave={() => {
+        rectRef.current = null;
         mx.set(0.5);
         my.set(0.5);
       }}
-      className="relative"
+      className="relative w-full max-w-full overflow-hidden"
       style={{ perspective: 1400 }}
     >
       {/* glow behind board */}
       <div
-        className="absolute -inset-4 sm:-inset-10 -z-10 rounded-[40px]"
+        className="absolute inset-0 sm:-inset-10 -z-10 rounded-[40px]"
         style={{
           background:
             'radial-gradient(58% 52% at 50% 42%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%)',
@@ -381,17 +393,17 @@ export function HeroKanban() {
 
       {/* the board */}
       <motion.div
-        initial={{ opacity: 0, y: 60, scale: 0.92, filter: 'blur(10px)' }}
-        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, y: 60, scale: 0.92 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1.1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="relative"
+        className="relative w-full max-w-full"
       >
         <div className="lp-float" style={{ animationDelay: '0.8s' }}>
           <motion.div
-            style={{ rotateX: reduced ? 0 : rotateX, rotateY: reduced ? 0 : rotateY }}
+            style={{ rotateX: !isDesktop || reduced ? 0 : rotateX, rotateY: !isDesktop || reduced ? 0 : rotateY }}
             className="lp-kb-board"
           >
-          <div className="lp-glass-deep rounded-[24px] p-3.5">
+          <div className="lp-glass-deep w-full max-w-full box-border rounded-[24px] p-3 sm:p-3.5">
             {/* board header */}
             <div className="mb-3 flex items-center justify-between px-1.5">
               <div>
@@ -438,7 +450,7 @@ export function HeroKanban() {
             </div>
 
             {/* columns */}
-            <div className="flex gap-2.5 overflow-x-auto pb-2 pt-0.5 snap-x snap-mandatory scroll-smooth sm:grid sm:grid-cols-3 sm:overflow-visible sm:snap-none">
+            <div className="flex gap-2.5 overflow-x-auto pb-2 pt-0.5 snap-x snap-mandatory scroll-smooth touch-pan-x sm:grid sm:grid-cols-3 sm:overflow-visible sm:snap-none">
               <Column id="todo" tasks={cols.todo} />
               <Column id="inprogress" tasks={cols.inprogress} />
               <Column id="done" tasks={cols.done} />
@@ -453,9 +465,9 @@ export function HeroKanban() {
         <AnimatePresence mode="wait">
           <motion.div
             key={toast}
-            initial={{ opacity: 0, y: 14, scale: 0.94, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, scale: 0.96, filter: 'blur(4px)' }}
+            initial={{ opacity: 0, y: 14, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.96 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="lp-glass-deep flex items-center gap-2.5 rounded-2xl px-4 py-3"
           >

@@ -121,8 +121,35 @@ export function LandingNavbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-page/95 px-6 pb-12 pt-24 backdrop-blur-2xl lg:hidden"
+            className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-page/95 px-6 pb-12 pt-4 backdrop-blur-2xl lg:hidden"
           >
+            {/* Top header bar with logo, theme switcher, and cross (X) close button */}
+            <div className="flex items-center justify-between border-b border-[color-mix(in_srgb,var(--text-1)_10%,transparent)] pb-4 pt-1 mb-6">
+              <Link
+                to="/"
+                onClick={() => setOpen(false)}
+                className="group flex items-center gap-2.5"
+              >
+                <div className="brand-mark h-8 w-8">
+                  <Kanban className="h-5 w-5" strokeWidth={2.4} />
+                </div>
+                <span className="text-[17px] font-extrabold tracking-tight text-ink">
+                  TaskTrace
+                </span>
+              </Link>
+              <div className="flex items-center gap-2.5">
+                <ThemeSwitcher />
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="icon-btn flex h-10 w-10 items-center justify-center rounded-full border border-border/80 bg-surface/80 text-ink shadow-sm transition-all hover:bg-surface active:scale-95"
+                  aria-label="Close navigation menu"
+                >
+                  <X className="h-5 w-5" strokeWidth={2.4} />
+                </button>
+              </div>
+            </div>
+
             <nav className="flex flex-col gap-1">
               {NAV_LINKS.map((l, i) => (
                 <motion.a

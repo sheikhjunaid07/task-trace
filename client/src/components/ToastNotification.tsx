@@ -11,30 +11,10 @@ import {
   Users,
   Bell,
 } from "lucide-react";
-import { getSocket } from "../sockets/socket";
 import type { AppNotification, NotificationType } from "../types";
 
-export interface ToastItem {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  boardId?: string;
-  taskId?: string;
-  timestamp: number;
-}
-
-// Global helper to trigger toast programmatically
-export const showToast = (toast: Omit<ToastItem, "id" | "timestamp">) => {
-  const event = new CustomEvent("app:toast", {
-    detail: {
-      ...toast,
-      id: `toast_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      timestamp: Date.now(),
-    },
-  });
-  window.dispatchEvent(event);
-};
+import { showToast, type ToastItem } from "../utils/toast";
+export { showToast, type ToastItem };
 
 interface SingleToastProps {
   toast: ToastItem;
@@ -207,37 +187,47 @@ export const ToastNotificationContainer: React.FC = () => {
 
   // Listen to Socket.IO real-time notification events
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    const handleSocketNotification = (notif: AppNotification) => {
-      const bId =
-        typeof notif.board === "object" && notif.board !== null
-          ? (notif.board as any)._id
-          : notif.board;
-      const tId =
-        typeof notif.task === "object" && notif.task !== null
-          ? (notif.task as any)._id
-          : notif.task;
+    let cleanup: (() => void) | undefined;
+    import("../sockets/socket").then(({ getSocket }) => {
+      const socket = getSocket();
+      if (!socket) return;
 
-      addToast({
-        type: notif.type,
-        title: notif.title,
-        message: notif.message,
-        boardId: bId,
-        taskId: tId,
-      });
-    };
+      const handleSocketNotification = (notif: AppNotification) => {
+        const bId =
+          typeof notif.board === "object" && notif.board !== null
+            ? (notif.board as any)._id
+            : notif.board;
+        const tId =
+          typeof notif.task === "object" && notif.task !== null
+            ? (notif.task as any)._id
+            : notif.task;
 
-    socket.on("notification:new", handleSocketNotification);
+        addToast({
+          type: notif.type,
+          title: notif.title,
+          message: notif.message,
+          boardId: bId,
+          taskId: tId,
+        });
+      };
+
+      socket.on("notification:new", handleSocketNotification);
+      cleanup = () => {
+        socket.off("notification:new", handleSocketNotification);
+      };
+    });
+
     return () => {
-      socket.off("notification:new", handleSocketNotification);
+      if (cleanup) cleanup();
     };
   }, [addToast]);
 
   return (
     <div className="fixed top-5 right-5 sm:top-6 sm:right-6 z-[9999] flex flex-col gap-2.5 max-w-sm sm:max-w-md w-full pointer-events-none select-none px-4 sm:px-0">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence>
         {toasts.map((toast) => (
           <SingleToastCard
             key={toast.id}

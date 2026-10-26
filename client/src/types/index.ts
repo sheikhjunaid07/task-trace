@@ -42,7 +42,6 @@ export interface Board {
   title: string;
   name?: string;
   description?: string;
-  icon?: string;
   color?: string;
   avatarUrl?: string;
   visibility?: 'public' | 'private';
@@ -153,4 +152,5 @@ export interface BoardFilterState {
   isActivityOpen: boolean;
   isAnalyticsOpen: boolean;
   selectedProjectId?: string | null;
+  isMobileMenuOpen?: boolean;
 }

@@ -100,7 +100,7 @@ export const boardApi = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: [{ type: 'Board', id: 'LIST' }, { type: 'Notification', id: 'LIST' }],
+      invalidatesTags: [{ type: 'Board', id: 'LIST' }],
     }),
     inviteMember: builder.mutation<{ statusCode: number; message: string; data: Invitation }, { boardId: string; email: string }>({
       query: ({ boardId, email }) => ({
@@ -111,7 +111,6 @@ export const boardApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, { boardId }) => [
         { type: 'Board', id: boardId },
         { type: 'Invitation', id: `BOARD_${boardId}` },
-        { type: 'Notification', id: 'LIST' },
       ],
     }),
     removeMember: builder.mutation<SingleBoardResponse, { boardId: string; memberId: string }>({
@@ -128,7 +127,6 @@ export const boardApi = baseApi.injectEndpoints({
         name?: string;
         title?: string;
         description?: string;
-        icon?: string;
         color?: string;
         avatarUrl?: string | null;
         visibility?: 'public' | 'private';
@@ -172,7 +170,7 @@ export const boardApi = baseApi.injectEndpoints({
         url: `/boards/${boardId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: [{ type: 'Board', id: 'LIST' }, { type: 'Notification', id: 'LIST' }],
+      invalidatesTags: [{ type: 'Board', id: 'LIST' }],
     }),
 
     // Column Management Mutations

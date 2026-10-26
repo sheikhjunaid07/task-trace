@@ -10,6 +10,7 @@ const initialState: BoardFilterState = {
   isActivityOpen: false,
   isAnalyticsOpen: false,
   selectedProjectId: null,
+  isMobileMenuOpen: false,
 };
 
 const boardSlice = createSlice({
@@ -48,6 +49,16 @@ const boardSlice = createSlice({
       state.isAnalyticsOpen =
         action.payload !== undefined ? action.payload : !state.isAnalyticsOpen;
     },
+    toggleMobileMenu: (
+      state,
+      action: PayloadAction<boolean | undefined>,
+    ) => {
+      state.isMobileMenuOpen =
+        action.payload !== undefined ? action.payload : !state.isMobileMenuOpen;
+    },
+    setMobileMenuOpen: (state, action: PayloadAction<boolean>) => {
+      state.isMobileMenuOpen = action.payload;
+    },
     resetFilters: (state) => {
       state.searchQuery = "";
       state.priorityFilter = "all";
@@ -64,6 +75,8 @@ export const {
   setActiveTaskId,
   toggleActivityDrawer,
   toggleAnalyticsModal,
+  toggleMobileMenu,
+  setMobileMenuOpen,
   resetFilters,
 } = boardSlice.actions;
 

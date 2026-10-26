@@ -78,7 +78,7 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
   return (
     <AnimatePresence>
       <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm cursor-pointer"
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm cursor-pointer"
         onClick={onClose}
       >
         <motion.div
@@ -90,7 +90,7 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
           exit={{ opacity: 0, scale: 0.94, y: 10 }}
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-lg rounded-2xl glass-card border border-white/10 p-6 shadow-2xl cursor-default select-none"
+          className="relative w-full max-w-lg rounded-2xl glass-card border border-white/10 p-4 sm:p-6 shadow-2xl cursor-default select-none"
           style={{ backgroundColor: 'var(--surface, #14151a)' }}
         >
           {/* Header */}

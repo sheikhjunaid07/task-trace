@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { logout } from '../features/auth/authSlice';
-import { setSelectedProjectId } from '../features/board/boardSlice';
+import { setSelectedProjectId, toggleMobileMenu } from '../features/board/boardSlice';
 import { useGetBoardsQuery } from '../api/boardApi';
 import {
   Kanban,
@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Check,
   Plus,
+  Menu,
 } from 'lucide-react';
 import ThemeSwitcher from '../theme/ThemeSwitcher';
 
@@ -54,14 +55,26 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="h-16 glass-panel border-x-0 border-t-0 border-b border-edge sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between text-ink select-none">
-      {/* Left: Brand + Dynamic Project Selector */}
-      <div className="flex items-center space-x-3 sm:space-x-5">
-        <Link to="/dashboard" className="flex items-center space-x-2.5 group">
-          <div className="brand-mark w-9 h-9">
-            <Kanban className="w-5 h-5" />
+    <nav className="h-16 glass-panel border-x-0 border-t-0 border-b border-edge sticky top-0 z-40 px-2.5 sm:px-6 flex items-center justify-between text-ink select-none">
+      {/* Left: Hamburger (mobile) + Brand + Dynamic Project Selector */}
+      <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
+        {isAuthenticated && (
+          <button
+            type="button"
+            onClick={() => dispatch(toggleMobileMenu())}
+            className="icon-btn flex h-9 w-9 md:!hidden shrink-0"
+            aria-label="Toggle navigation drawer"
+            title="Toggle navigation"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+        <Link to="/dashboard" className="flex items-center space-x-2 group shrink-0">
+          <div className="brand-mark w-8 h-8 sm:w-9 sm:h-9">
+            <Kanban className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <span className="font-black text-xl tracking-tight text-ink">
+          <span className="font-black text-lg sm:text-xl tracking-tight text-ink hidden xs:inline sm:inline">
             TaskTrace
           </span>
         </Link>
@@ -73,21 +86,21 @@ export const Navbar: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="flex items-center space-x-2 px-3 py-1.5 rounded-xl border border-edge bg-surface/50 hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] text-xs font-semibold text-ink transition-colors cursor-pointer"
+                className="flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1.5 rounded-xl border border-edge bg-surface/50 hover:bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)] text-xs font-semibold text-ink transition-colors cursor-pointer"
                 title="Select Project"
               >
-                <Building2 className="w-3.5 h-3.5 text-mute" />
-                <span className="max-w-[140px] truncate">{currentProjectName}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-mute" />
+                <Building2 className="w-3.5 h-3.5 text-mute shrink-0" />
+                <span className="max-w-[75px] xs:max-w-[110px] sm:max-w-[140px] truncate">{currentProjectName}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-mute shrink-0" />
               </button>
 
-              {/* Role Badge */}
+              {/* Role Badge - hidden on tiny mobile screens */}
               {isUserAdmin ? (
-                <div className="px-2.5 py-0.5 rounded-full bg-purple-600/25 text-purple-200 border border-purple-500/40 text-[10px] font-bold uppercase tracking-wider">
+                <div className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-purple-600/25 text-purple-200 border border-purple-500/40 text-[10px] font-bold uppercase tracking-wider">
                   ADMIN
                 </div>
               ) : (
-                <div className="px-2.5 py-0.5 rounded-full bg-blue-600/20 text-blue-200 border border-blue-500/35 text-[10px] font-bold uppercase tracking-wider">
+                <div className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-blue-600/20 text-blue-200 border border-blue-500/35 text-[10px] font-bold uppercase tracking-wider">
                   MEMBER
                 </div>
               )}
@@ -95,7 +108,7 @@ export const Navbar: React.FC = () => {
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="glass-panel absolute left-0 top-11 z-50 w-60 rounded-2xl p-1.5 shadow-2xl border border-white/10 bg-card">
+              <div className="glass-panel absolute left-0 top-11 z-50 w-56 sm:w-60 rounded-2xl p-1.5 shadow-2xl border border-white/10 bg-card">
                 <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-300 border-b border-edge">
                   Your Projects ({boards.length})
                 </div>
@@ -152,18 +165,18 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* Right: Controls & User Profile */}
-      <div className="flex items-center space-x-2 sm:space-x-3">
+      <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
         {/* Dynamic Theme Switcher */}
         <ThemeSwitcher />
 
         {isAuthenticated && user ? (
-          <div className="flex items-center space-x-2 sm:space-x-3 ml-1 sm:ml-2">
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5 ml-0.5 sm:ml-2">
             {/* User Profile Chip */}
-            <div className="flex items-center space-x-2.5 px-3 py-1.5 rounded-full glass-panel border border-edge">
-              <div className="avatar w-7 h-7 text-xs font-bold text-white bg-accent shadow-sm flex items-center justify-center rounded-full">
+            <div className="flex items-center space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full glass-panel border border-edge">
+              <div className="avatar w-6 h-6 sm:w-7 sm:h-7 text-[11px] sm:text-xs font-bold text-white bg-accent shadow-sm flex items-center justify-center rounded-full shrink-0">
                 {user.name ? user.name[0].toUpperCase() : 'U'}
               </div>
-              <span className="text-xs sm:text-sm font-semibold text-ink max-w-[120px] truncate hidden sm:inline">
+              <span className="text-xs sm:text-sm font-semibold text-ink max-w-[100px] truncate hidden md:inline">
                 {user.name}
               </span>
             </div>
@@ -171,19 +184,19 @@ export const Navbar: React.FC = () => {
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="icon-btn text-danger hover:bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] hover:text-danger"
+              className="icon-btn text-danger hover:bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] hover:text-danger w-8 h-8 sm:w-9 sm:h-9"
               title="Log out"
               aria-label="Log out"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         ) : (
-          <div className="flex items-center space-x-2">
-            <Link to="/login" className="btn btn-ghost">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Link to="/login" className="btn btn-ghost px-2.5 py-1 text-xs sm:text-sm sm:px-4 sm:py-2">
               Sign In
             </Link>
-            <Link to="/register" className="btn btn-primary">
+            <Link to="/register" className="btn btn-primary px-3 py-1 text-xs sm:text-sm sm:px-4 sm:py-2">
               Get Started
             </Link>
           </div>

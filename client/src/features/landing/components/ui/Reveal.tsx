@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import type { ReactNode } from "react";
 
 interface RevealProps {
   children: ReactNode;
@@ -24,17 +24,12 @@ export function Reveal({
   once = true,
 }: RevealProps) {
   const reduced = useReducedMotion();
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 1024);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
+  const [isDesktop] = useState(
+    () => typeof window !== "undefined" && window.innerWidth >= 1024,
+  );
 
   const effectiveX = isDesktop ? x : 0;
-  const effectiveY = isDesktop ? y : (y !== 0 ? y : 24);
+  const effectiveY = isDesktop ? y : y !== 0 ? y : 24;
 
   return (
     <motion.div
@@ -43,15 +38,13 @@ export function Reveal({
         opacity: 0,
         y: reduced ? 0 : effectiveY,
         x: reduced ? 0 : effectiveX,
-        filter: reduced ? 'blur(0px)' : 'blur(8px)',
       }}
       whileInView={{
         opacity: 1,
         y: 0,
         x: 0,
-        filter: 'blur(0px)',
       }}
-      viewport={{ once, margin: isDesktop ? '-80px' : '-30px' }}
+      viewport={{ once, margin: isDesktop ? "-80px" : "-30px" }}
       transition={{ duration, delay, ease: EASE }}
     >
       {children}

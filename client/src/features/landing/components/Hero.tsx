@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Play, Sparkles, Star } from 'lucide-react';
@@ -6,16 +6,15 @@ import { HeroKanban } from './HeroKanban';
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.11, delayChildren: 0.15 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
+  hidden: { opacity: 0, y: 22 },
   show: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
-    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
@@ -29,14 +28,7 @@ const AVATARS = [
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 1024);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
+  const [isDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -49,7 +41,7 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-svh items-center overflow-hidden pb-16 pt-28 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-40"
+      className="relative flex min-h-svh w-full max-w-full items-center overflow-x-hidden pb-16 pt-24 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-40"
     >
       {/* backdrop layers */}
       <div className="lp-grid-bg absolute inset-0" />
@@ -69,9 +61,9 @@ export function Hero() {
       />
       <div className="lp-noise" />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-[1240px] items-center gap-12 px-4 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+      <div className="relative z-10 mx-auto grid w-full max-w-[1240px] min-w-0 items-center gap-10 sm:gap-12 px-4 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
         {/* ——— copy ——— */}
-        <motion.div variants={container} initial="hidden" animate="show" style={{ y: isDesktop ? textY : 0 }}>
+        <motion.div variants={container} initial="hidden" animate="show" style={{ y: isDesktop ? textY : 0 }} className="w-full min-w-0">
           <motion.div variants={item}>
             <span className="lp-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2">
               <span className="relative flex h-1.5 w-1.5">
@@ -87,12 +79,12 @@ export function Hero() {
 
           <motion.h1
             variants={item}
-            className="lp-hero-title mt-5 sm:mt-6 text-ink"
+            className="lp-hero-title mt-5 sm:mt-6 text-ink break-words"
           >
             Work flows better{' '}
-            <br className="hidden sm:inline" />
+            <br className="inline" />
             when everything{' '}
-            <br className="hidden sm:inline" />
+            <br className="inline" />
             <span className="lp-text-gradient">flows together.</span>
           </motion.h1>
 
@@ -103,17 +95,17 @@ export function Hero() {
             TaskTrace brings instant tasks, real-time collaboration, and fluid Kanban workflows into one distraction-free workspace.
           </motion.p>
 
-          <motion.div variants={item} className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4">
+          <motion.div variants={item} className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full min-w-0">
             <Link
               to="/register"
-              className="btn btn-primary h-12 sm:h-13 w-full sm:w-auto rounded-full px-8 py-3.5 text-[15.5px] font-bold shadow-[0_12px_32px_-8px_var(--glow)] hover:shadow-[0_18px_40px_-6px_var(--glow)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="btn btn-primary h-12 sm:h-13 w-full sm:w-auto rounded-full px-6 sm:px-8 py-3.5 text-[15px] sm:text-[15.5px] font-bold shadow-[0_12px_32px_-8px_var(--glow)] hover:shadow-[0_18px_40px_-6px_var(--glow)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Start Free</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="#product"
-              className="btn lp-glass h-12 sm:h-13 w-full sm:w-auto rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-ink/85 hover:text-ink hover:bg-white/[0.08] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+              className="btn lp-glass h-12 sm:h-13 w-full sm:w-auto rounded-full px-6 sm:px-7 py-3.5 text-[14px] sm:text-[14.5px] font-semibold text-ink/85 hover:text-ink hover:bg-white/[0.08] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--accent)_16%,transparent)] text-accent">
                 <Play className="h-3 w-3 fill-current" />
@@ -122,7 +114,7 @@ export function Hero() {
             </a>
           </motion.div>
 
-          <motion.div variants={item} className="mt-10 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-x-6">
+          <motion.div variants={item} className="mt-8 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-x-6 w-full min-w-0">
             <div className="flex items-center gap-3">
               <div className="flex">
                 {AVATARS.map((g, i) => (
@@ -154,7 +146,7 @@ export function Hero() {
         </motion.div>
 
         {/* ——— animated kanban ——— */}
-        <motion.div style={{ y: isDesktop ? kanbanY : 0 }} className="relative lg:pl-4">
+        <motion.div style={{ y: isDesktop ? kanbanY : 0 }} className="relative w-full min-w-0 max-w-full lg:pl-4">
           <HeroKanban />
         </motion.div>
       </div>

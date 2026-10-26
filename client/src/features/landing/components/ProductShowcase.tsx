@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Bell,
@@ -53,8 +54,9 @@ const COLUMNS = [
 ];
 
 export function ProductShowcase() {
+  const [isDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
   return (
-    <section id="product" className="relative overflow-hidden py-20 sm:py-24 lg:py-32 scroll-mt-24">
+    <section id="product" className="relative w-full max-w-full overflow-hidden py-20 sm:py-24 lg:py-32 scroll-mt-24">
       <div className="lp-blob left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2" style={{ background: 'radial-gradient(ellipse, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%)' }} />
       <div className="lp-noise" />
 
@@ -71,15 +73,16 @@ export function ProductShowcase() {
         />
 
         <Reveal delay={0.1} y={40}>
-          <div className="mx-auto mt-14 sm:mt-20 max-w-6xl" style={{ perspective: 1600 }}>
+          <div className="mx-auto mt-14 sm:mt-20 max-w-6xl w-full min-w-0" style={{ perspective: 1600 }}>
             <motion.div
-              initial={{ rotateX: 14, scale: 0.94, y: 40, opacity: 0 }}
+              initial={{ rotateX: isDesktop ? 14 : 0, scale: 0.94, y: 40, opacity: 0 }}
               whileInView={{ rotateX: 0, scale: 1, y: 0, opacity: 1 }}
               viewport={{ once: true, margin: '-120px' }}
               transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
               style={{ transformStyle: 'preserve-3d' }}
+              className="w-full min-w-0"
             >
-              <div className="lp-browser relative">
+              <div className="lp-browser relative w-full min-w-0 overflow-hidden">
                 {/* browser chrome */}
                 <div className="flex items-center gap-4 border-b border-edge px-4 py-3">
                   <div className="flex gap-1.5">
@@ -91,7 +94,7 @@ export function ProductShowcase() {
                     <span className="flex h-3 w-3 items-center justify-center rounded-full text-white" style={{ background: 'var(--grad-accent)', color: '#ffffff' }}>
                       <Kanban className="h-2 w-2" strokeWidth={3} style={{ color: '#ffffff', stroke: '#ffffff' }} />
                     </span>
-                    <span className="text-[10px] font-medium text-faint">tasktrace.app/acme/product-launch</span>
+                    <span className="text-[10px] font-medium text-faint truncate">tasktrace.app/acme/product-launch</span>
                   </div>
                   <div className="flex items-center gap-2 text-faint">
                     <Search className="h-3.5 w-3.5" />
@@ -100,7 +103,7 @@ export function ProductShowcase() {
                   </div>
                 </div>
 
-                <div className="flex">
+                <div className="flex w-full min-w-0">
                   {/* ── sidebar ── */}
                   <div className="hidden w-44 shrink-0 flex-col border-r border-edge p-3 md:flex">
                     <div className="mb-4 flex items-center gap-2 px-1.5">
@@ -160,7 +163,7 @@ export function ProductShowcase() {
                   </div>
 
                   {/* ── main board ── */}
-                  <div className="min-w-0 flex-1 p-4">
+                  <div className="min-w-0 flex-1 p-3 sm:p-4 overflow-hidden">
                     <div className="mb-3 flex flex-wrap items-center gap-3">
                       <div className="mr-auto">
                         <p className="flex items-center gap-2 text-[13px] font-extrabold tracking-tight text-ink">
@@ -187,7 +190,7 @@ export function ProductShowcase() {
                       </span>
                     </div>
 
-                    <div className="flex gap-2.5 overflow-x-auto pb-1.5 sm:grid sm:grid-cols-3 sm:overflow-visible">
+                    <div className="flex gap-2.5 overflow-x-auto pb-1.5 touch-pan-x sm:grid sm:grid-cols-3 sm:overflow-visible">
                       {COLUMNS.map((col) => (
                         <div key={col.name} className="min-w-[170px] flex-1 rounded-xl border border-edge bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] p-2 sm:min-w-0">
                           <div className="mb-2 flex items-center gap-1.5 px-1">
@@ -223,8 +226,9 @@ export function ProductShowcase() {
                                   {c.progress !== undefined && (
                                     <div className="ml-auto h-[3px] w-8 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--text-1)_10%,transparent)]">
                                       <motion.div
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: `${c.progress}%` }}
+                                        style={{ width: `${c.progress}%`, transformOrigin: 'left' }}
+                                        initial={{ scaleX: 0 }}
+                                        whileInView={{ scaleX: 1 }}
                                         viewport={{ once: true }}
                                         transition={{ duration: 1, ease: 'easeOut' }}
                                         className="h-full rounded-full bg-accent"

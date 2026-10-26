@@ -15,7 +15,6 @@ export const updateBoardSchema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
   title: z.string().trim().min(1).max(100).optional(),
   description: z.string().trim().max(500).optional(),
-  icon: z.string().optional(),
   color: z.string().optional(),
   avatarUrl: z.string().nullable().optional(),
   visibility: z.enum(["public", "private"]).optional(),

@@ -76,7 +76,7 @@ export const RegisterPage: React.FC = () => {
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.45, ease: [0.22, 0.8, 0.32, 1] }}
-        className="relative w-full max-w-md modal-panel p-8"
+        className="relative w-full max-w-md modal-panel p-5 sm:p-8 rounded-2xl"
       >
         <div className="flex flex-col items-center mb-6 text-center">
           <div className="brand-mark w-14 h-14 mb-4">

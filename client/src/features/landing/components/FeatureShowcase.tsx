@@ -31,9 +31,9 @@ function MockupFrame({
   className?: string;
 }) {
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative w-full max-w-full ${className}`}>
       <div
-        className="absolute -inset-4 sm:-inset-8 rounded-[40px] opacity-70"
+        className="absolute inset-0 sm:-inset-8 rounded-[40px] opacity-70"
         style={{
           background: `radial-gradient(52% 48% at 50% 42%, color-mix(in srgb, ${glow} 12%, transparent), transparent 72%)`,
           filter: 'blur(24px)',
@@ -286,12 +286,12 @@ function TasksMockup() {
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)]">
         <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: '67%' }}
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.1, ease: 'easeOut' }}
           className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg,#8b5cf6,#a855f7)' }}
+          style={{ width: '67%', transformOrigin: 'left', background: 'linear-gradient(90deg,#8b5cf6,#a855f7)' }}
         />
       </div>
 
@@ -531,7 +531,7 @@ const FEATURES: Feature[] = [
 
 export function FeatureShowcase() {
   return (
-    <section id="features" className="relative overflow-hidden py-20 sm:py-24 lg:py-32 scroll-mt-24">
+    <section id="features" className="relative w-full max-w-full overflow-hidden py-20 sm:py-24 lg:py-32 scroll-mt-24">
       <div className="lp-blob right-[-15%] top-24 h-[520px] w-[520px]" style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--accent) 9%, transparent), transparent 65%)' }} />
       <div className="lp-noise" />
 

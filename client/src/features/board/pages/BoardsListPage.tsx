@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useGetBoardsQuery, useCreateBoardMutation, useDeleteBoardMutation } from '../../../api/boardApi';
 import { Plus, LayoutGrid, Users, Calendar, ArrowRight, X, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { showToast } from '../../../components/ToastNotification';
+import { showToast } from '../../../utils/toast';
 import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
 import type { Board } from '../../../types';
 
@@ -78,28 +78,28 @@ export const BoardsListPage: React.FC = () => {
   const boards: Board[] = data?.data || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+    <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-10">
         <div>
-          <h1 className="text-hero text-ink flex items-center space-x-3">
-            <LayoutGrid className="w-9 h-9" style={{ color: 'var(--accent)' }} />
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-ink flex items-center space-x-2.5 sm:space-x-3">
+            <LayoutGrid className="w-7 h-7 sm:w-9 sm:h-9" style={{ color: 'var(--accent)' }} />
             <span>Workspace Boards</span>
           </h1>
-          <p className="text-body text-mute mt-1.5">
+          <p className="text-xs sm:text-sm text-mute mt-1.5">
             Manage and collaborate on your real-time Kanban projects
           </p>
         </div>
 
-        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary px-6 py-3">
-          <Plus className="w-5 h-5" />
+        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary self-start sm:self-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm">
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
           <span>Create New Board</span>
         </button>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-44 skeleton" />
+            <div key={i} className="h-44 skeleton rounded-2xl" />
           ))}
         </div>
       ) : error ? (
@@ -111,22 +111,22 @@ export const BoardsListPage: React.FC = () => {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="glass-card p-12 text-center max-w-lg mx-auto my-12"
+          className="glass-card p-8 sm:p-12 text-center max-w-lg mx-auto my-8 sm:my-12 rounded-2xl"
         >
-          <div className="brand-mark w-16 h-16 mx-auto mb-5">
-            <LayoutGrid className="w-8 h-8" />
+          <div className="brand-mark w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-5">
+            <LayoutGrid className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="text-card-title text-xl font-bold text-ink mb-2">No Boards Found</h3>
-          <p className="text-body text-mute mb-7">
+          <h3 className="text-card-title text-lg sm:text-xl font-bold text-ink mb-2">No Boards Found</h3>
+          <p className="text-body text-xs sm:text-sm text-mute mb-6 sm:mb-7">
             Get started by creating your first real-time Kanban board!
           </p>
-          <button onClick={() => setIsModalOpen(true)} className="btn btn-primary px-6 py-2.5">
+          <button onClick={() => setIsModalOpen(true)} className="btn btn-primary px-5 sm:px-6 py-2.5 text-xs sm:text-sm">
             <Plus className="w-4 h-4" />
             <span>Create Board</span>
           </button>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {boards.map((board: Board, idx: number) => (
             <motion.div
               key={board._id}
@@ -136,15 +136,15 @@ export const BoardsListPage: React.FC = () => {
             >
               <Link
                 to={`/boards/${board._id}`}
-                className="group block glass-card card-lift p-6 relative overflow-hidden"
+                className="group block glass-card card-lift p-5 sm:p-6 relative overflow-hidden rounded-2xl"
               >
                 <div
                   className="absolute top-0 right-0 w-36 h-36 rounded-full blur-2xl opacity-60 group-hover:opacity-90 transition-opacity"
                   style={{ background: 'radial-gradient(circle, var(--glow), transparent 65%)' }}
                 />
 
-                <div className="flex items-start justify-between mb-4">
-                  <h2 className="text-card-title text-xl font-bold text-ink line-clamp-1">
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <h2 className="text-card-title text-lg sm:text-xl font-bold text-ink line-clamp-1">
                     {board.name}
                   </h2>
                   <div className="flex items-center space-x-1.5 shrink-0 ml-2">
@@ -155,12 +155,12 @@ export const BoardsListPage: React.FC = () => {
                         e.stopPropagation();
                         setBoardToDelete(board);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
+                      className="opacity-70 sm:opacity-0 sm:group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
                       title="Delete Board"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <ArrowRight className="w-5 h-5 text-faint group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-faint group-hover:text-accent group-hover:translate-x-1 transition-all" />
                   </div>
                 </div>
 

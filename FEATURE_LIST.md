@@ -30,7 +30,7 @@ Comprehensive document listing all features, technical architecture, API endpoin
 - **Touch-Friendly Drag & Drop (`TouchSensor`)**: Long-press activation (`delay: 250ms`, `tolerance: 5px`) allows smooth vertical page scrolling on phones while enabling touch drag-and-drop for task cards and columns!
 - **Touch Horizontal Scroll Snap (`snap-x`)**: Columns container supports fluid, native horizontal swiping on mobile touchscreens (`w-[85vw] sm:w-80`).
 - **Mobile Left Sidebar Overlay**: Left Sidebar automatically collapses into a compact drawer on narrow screens (`< 768px`) to maximize board viewport space on mobile devices.
-- **Mobile Responsive Modals & Drawers**: `TaskModal`, `BoardMembersModal`, `HeaderNotifications`, `FilterBar`, and `ActivityTimeline` automatically scale to mobile viewports (`320px–480px`) with stacked inputs and responsive padding (`p-3 sm:p-6`).
+- **Mobile Responsive Modals & Drawers**: `TaskModal`, `BoardMembersModal`, `FilterBar`, and `ActivityTimeline` automatically scale to mobile viewports (`320px–480px`) with stacked inputs and responsive padding (`p-3 sm:p-6`).
 
 ### ⌨️ Real-Time Typing Indicators (`TypingIndicator.tsx`)
 - **Debounced Auto-Clearing Timer**: Automatically dispatches `typing:start` on keystrokes in Task Title, TipTap Description, or Comment input fields. Pausing for 2.5 seconds automatically dispatches `typing:stop`.
@@ -66,14 +66,10 @@ Comprehensive document listing all features, technical architecture, API endpoin
 - **Kick Member Action**: Board owners have a "Kick Member" control next to collaborators in `BoardMembersModal.tsx`.
 - **Real-Time Removal**: Kicking a member immediately removes them from `board.members`, logs `MEMBER_REMOVED` activity, and emits `board:member-removed` socket event.
 
-### 🔔 Header Notification System (`HeaderNotifications.tsx`)
-- **Header Notification Bell**: Animated bell icon in `Navbar.tsx` displaying an unread counter badge.
-- **Real-Time Delivery**: Listens to socket room `user:<userId>` for instantaneous `notification:new` events.
-- **Board Invitation Notifications**: Features direct **Accept** and **Decline** action buttons right inside the dropdown.
-- **Task `@Member` Mention Notifications**:
-  - Automatically triggers when a collaborator tags `@Member Name` in a task description.
-  - Clicking the notification marks it read, navigates to the board, and automatically opens the target task modal.
-- **Mark All Read Action**: Single click to mark all notifications read.
+### 🔔 Real-Time Live Sync & Toast Notification System (`ToastNotification.tsx`)
+- **Real-Time Notification Delivery**: Listens to socket events for instantaneous real-time sync across connected collaborators.
+- **Board Invitation Notifications**: Features direct alerts and invitation response banners in `PendingInvitationsBanner.tsx`.
+- **Toast Alerts**: Instant visual toast alerts for task updates, status changes, assignments, and board operations.
 
 ### 🧭 Collapsible Left Sidebar & Board Navigation (`LeftSidebar.tsx`)
 - **Real-Time Board Search**: Instant search input filtering workspace boards by title/name.

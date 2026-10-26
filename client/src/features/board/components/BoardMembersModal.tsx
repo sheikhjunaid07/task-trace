@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
-import { showToast } from '../../../components/ToastNotification';
+import { showToast } from '../../../utils/toast';
 
 interface BoardMembersModalProps {
   board: Board;
@@ -132,12 +132,12 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
   const ownerUser = typeof board.owner === 'object' ? (board.owner as User) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/80 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-xl glass-card rounded-2xl p-6 border border-slate-800 shadow-2xl relative flex flex-col max-h-[85vh]"
+        className="w-full max-w-xl glass-card rounded-2xl p-4 sm:p-6 border border-slate-800 shadow-2xl relative flex flex-col max-h-[90vh]"
       >
         <button
           onClick={onClose}
@@ -146,18 +146,18 @@ export const BoardMembersModal: React.FC<BoardMembersModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-            <Users className="w-5 h-5" />
+        <div className="flex items-center space-x-3 mb-4 sm:mb-6 pr-8">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">Board Members & Access</h3>
-            <p className="text-xs text-slate-400">Share board link, manage collaborators, and kick members</p>
+            <h3 className="text-base sm:text-lg font-bold text-white">Board Members & Access</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400">Share board link, manage collaborators, and kick members</p>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-800 mb-4 gap-2 overflow-x-auto">
+        <div className="flex border-b border-slate-800 mb-4 gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('members')}
             className={`pb-2 px-3 text-xs font-semibold border-b-2 transition-all flex items-center space-x-1.5 shrink-0 ${

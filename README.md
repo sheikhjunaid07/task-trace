@@ -64,9 +64,9 @@ A modern, high-performance, real-time collaborative Kanban application built wit
 .
 ├── client/                     # React 19 Frontend App
 │   ├── src/
-│   │   ├── api/                # RTK Query APIs (boardApi, taskApi, commentApi, notificationApi, uploadApi)
+│   │   ├── api/                # RTK Query APIs (boardApi, taskApi, commentApi, uploadApi)
 │   │   ├── app/                # Redux store & custom hooks
-│   │   ├── components/         # Global components (Navbar, LeftSidebar, HeaderNotifications, RichTextEditor)
+│   │   ├── components/         # Global components (Navbar, LeftSidebar, RichTextEditor, ToastNotification)
 │   │   ├── features/
 │   │   │   ├── auth/           # Login & Register views
 │   │   │   ├── board/          # Board details, header, filter bar, members modal, analytics

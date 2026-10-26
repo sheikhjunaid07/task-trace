@@ -43,7 +43,6 @@ export const createBoard = asyncHandler(async (req: Request, res: Response) => {
   const board = await Board.create({
     name: boardName,
     description: req.body.description,
-    icon: req.body.icon || "🚀",
     color: req.body.color || "#8b5cf6",
     avatarUrl: req.body.avatarUrl || null,
     visibility: req.body.visibility || "private",
@@ -304,10 +303,6 @@ export const getBoardById = asyncHandler(async (req: Request, res: Response) => 
     needsSave = true;
   }
 
-  if (!board.icon) {
-    board.icon = "🚀";
-    needsSave = true;
-  }
   if (!board.color) {
     board.color = "#8b5cf6";
     needsSave = true;
@@ -356,9 +351,6 @@ export const updateBoard = asyncHandler(async (req: Request, res: Response) => {
   if (typeof newName === "string" && newName.trim()) board.name = newName.trim();
   if (typeof req.body.description === "string") {
     board.description = req.body.description;
-  }
-  if (typeof req.body.icon === "string") {
-    board.icon = req.body.icon;
   }
   if (typeof req.body.color === "string") {
     board.color = req.body.color;

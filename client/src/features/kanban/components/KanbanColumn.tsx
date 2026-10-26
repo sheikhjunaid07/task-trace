@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { columnColor } from '../../../utils/columnTheming';
-import { showToast } from '../../../components/ToastNotification';
+import { showToast } from '../../../utils/toast';
 import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
 import type { TypingUser, DraggingUser } from '../../../sockets/useSocketEvents';
 
@@ -151,7 +151,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.32, ease: [0.22, 0.8, 0.32, 1] }}
-      className="column-card w-[85vw] sm:w-80 shrink-0 snap-start flex flex-col max-h-full glass-panel rounded-2xl p-4 group/col"
+      className="column-card w-[84vw] max-w-[340px] sm:w-80 shrink-0 snap-center sm:snap-start flex flex-col max-h-full glass-panel rounded-2xl p-3.5 sm:p-4 group/col"
     >
       {/* Column Header */}
       <div className="flex items-center justify-between pb-3 mb-3 border-b divider">
