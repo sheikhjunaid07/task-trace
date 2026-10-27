@@ -7,13 +7,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import {
-  CircleCheck,
-  MessageSquare,
-  TrendingUp,
-  Users,
-  Zap,
-} from "lucide-react";
+import { MessageSquare, TrendingUp } from "lucide-react";
 
 type Priority = "low" | "medium" | "high" | "critical";
 type ColId = "todo" | "inprogress" | "done";
@@ -108,21 +102,6 @@ const INITIAL: Record<ColId, KbTask[]> = {
     },
   ],
 };
-
-const TOASTS = [
-  {
-    icon: CircleCheck,
-    color: "var(--success)",
-    text: 'Ava completed "Design review"',
-  },
-  {
-    icon: MessageSquare,
-    color: "var(--accent)",
-    text: 'Liam commented on "Landing page"',
-  },
-  { icon: Zap, color: "var(--warning)", text: "Task reordered in real time" },
-  { icon: Users, color: "var(--accent-2)", text: "Maya joined Product Launch" },
-];
 
 function Card({ task }: { task: KbTask }) {
   return (
@@ -231,7 +210,6 @@ function Column({ id, tasks }: { id: ColId; tasks: KbTask[] }) {
 
 export function HeroKanban() {
   const [cols, setCols] = useState<Record<ColId, KbTask[]>>(INITIAL);
-  const [toast, setToast] = useState(0);
   const [isDesktop] = useState(
     () => typeof window !== "undefined" && window.innerWidth >= 1024,
   );
@@ -291,18 +269,6 @@ export function HeroKanban() {
     };
   }, [reduced]);
 
-  useEffect(() => {
-    if (reduced) return;
-    let t: ReturnType<typeof setInterval>;
-    const delayTimer = setTimeout(() => {
-      t = setInterval(() => setToast((v) => (v + 1) % TOASTS.length), 5500);
-    }, 6000);
-    return () => {
-      clearTimeout(delayTimer);
-      if (t) clearInterval(t);
-    };
-  }, [reduced]);
-
   const totalTasks =
     cols.todo.length + cols.inprogress.length + cols.done.length;
 
@@ -330,7 +296,7 @@ export function HeroKanban() {
         mx.set(0.5);
         my.set(0.5);
       }}
-      className="relative w-full max-w-full overflow-hidden"
+      className="relative w-full max-w-full"
       style={{ perspective: 1400 }}
     >
       {/* glow behind board */}
@@ -348,7 +314,7 @@ export function HeroKanban() {
         initial={{ opacity: 0, scale: 0.85, x: -20 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
         transition={{ delay: 0.9, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute -left-8 -top-7 z-20 hidden lg:block"
+        className="absolute -left-6 -top-5 z-20 hidden lg:block"
       >
         <div className="lp-float-slow">
           <div className="lp-glass-deep flex items-center gap-2.5 rounded-2xl px-4 py-3">
@@ -375,7 +341,7 @@ export function HeroKanban() {
         initial={{ opacity: 0, scale: 0.85, x: 20 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
         transition={{ delay: 1.05, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute -bottom-8 -left-10 z-20 hidden lg:block"
+        className="absolute -bottom-6 -left-8 z-20 hidden lg:block"
       >
         <div className="lp-float" style={{ animationDelay: "1.2s" }}>
           <div className="lp-glass-deep flex items-center gap-3 rounded-2xl px-4 py-3">
@@ -476,7 +442,7 @@ export function HeroKanban() {
               </div>
 
               {/* columns */}
-              <div className="flex gap-2.5 overflow-x-auto pb-2 pt-0.5 snap-x snap-mandatory scroll-smooth overscroll-x-contain sm:grid sm:grid-cols-3 sm:overflow-visible sm:snap-none">
+              <div className="flex gap-2.5 overflow-x-auto pb-2 pt-0.5 snap-x snap-mandatory scroll-smooth sm:grid sm:grid-cols-3 sm:overflow-visible sm:snap-none">
                 <Column id="todo" tasks={cols.todo} />
                 <Column id="inprogress" tasks={cols.inprogress} />
                 <Column id="done" tasks={cols.done} />
@@ -485,66 +451,6 @@ export function HeroKanban() {
           </motion.div>
         </div>
       </motion.div>
-
-      {/* live toast — desktop floating */}
-      {isDesktop && (
-        <div className="absolute -right-4 top-16 z-20">
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={toast}
-              initial={{ opacity: 0, y: 14, scale: 0.94 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.96 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="lp-glass-deep flex items-center gap-2.5 rounded-2xl px-4 py-3"
-            >
-              {(() => {
-                const T = TOASTS[toast];
-                return (
-                  <>
-                    <T.icon
-                      className="h-4 w-4 shrink-0"
-                      style={{ color: T.color }}
-                    />
-                    <p className="max-w-[170px] text-[11.5px] font-medium text-ink">
-                      {T.text}
-                    </p>
-                  </>
-                );
-              })()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* live toast — mobile inline pill */}
-      {!isDesktop && (
-        <div className="mt-3 flex justify-center">
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={toast}
-              initial={{ opacity: 0, y: 6, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.96 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="lp-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5"
-            >
-              {(() => {
-                const T = TOASTS[toast];
-                return (
-                  <>
-                    <T.icon
-                      className="h-3.5 w-3.5 shrink-0"
-                      style={{ color: T.color }}
-                    />
-                    <p className="text-[11px] font-medium text-ink">{T.text}</p>
-                  </>
-                );
-              })()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      )}
     </div>
   );
 }

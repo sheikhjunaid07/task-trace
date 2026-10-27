@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Play, Sparkles, Star } from 'lucide-react';
-import { HeroKanban } from './HeroKanban';
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Play, Sparkles, Star } from "lucide-react";
+import { HeroKanban } from "./HeroKanban";
 
 const container = {
   hidden: {},
@@ -19,20 +19,22 @@ const item = {
 };
 
 const AVATARS = [
-  'linear-gradient(135deg,#8b5cf6,#a855f7)',
-  'linear-gradient(135deg,#ec4899,#f472b6)',
-  'linear-gradient(135deg,#22c55e,#10b981)',
-  'linear-gradient(135deg,#3b82f6,#06b6d4)',
-  'linear-gradient(135deg,#f59e0b,#f97316)',
+  "linear-gradient(135deg,#8b5cf6,#a855f7)",
+  "linear-gradient(135deg,#ec4899,#f472b6)",
+  "linear-gradient(135deg,#22c55e,#10b981)",
+  "linear-gradient(135deg,#3b82f6,#06b6d4)",
+  "linear-gradient(135deg,#f59e0b,#f97316)",
 ];
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
-  const [isDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
+  const [isDesktop] = useState(
+    () => typeof window !== "undefined" && window.innerWidth >= 1024,
+  );
 
   const { scrollYProgress } = useScroll({
     target: isDesktop ? ref : undefined,
-    offset: ['start start', 'end start'],
+    offset: ["start start", "end start"],
   });
   const kanbanY = useTransform(scrollYProgress, [0, 1], [0, 110]);
   const textY = useTransform(scrollYProgress, [0, 1], [0, 60]);
@@ -41,7 +43,7 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-svh w-full max-w-full items-center overflow-x-hidden pb-16 pt-24 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-40"
+      className="relative flex min-h-svh w-full max-w-full items-center overflow-hidden pb-14 pt-20 sm:pb-16 sm:pt-24 lg:pb-20 lg:pt-28"
     >
       {/* backdrop layers */}
       <div className="lp-grid-bg absolute inset-0" />
@@ -49,28 +51,37 @@ export function Hero() {
         className="lp-blob -top-32 right-[-10%] h-[560px] w-[560px]"
         style={{
           background:
-            'radial-gradient(circle, color-mix(in srgb, var(--accent) 26%, transparent), transparent 65%)',
+            "radial-gradient(circle, color-mix(in srgb, var(--accent) 26%, transparent), transparent 65%)",
         }}
       />
       <div
         className="lp-blob bottom-[-20%] left-[-12%] h-[480px] w-[480px]"
         style={{
           background:
-            'radial-gradient(circle, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 65%)',
+            "radial-gradient(circle, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 65%)",
         }}
       />
       <div className="lp-noise" />
 
       <div className="relative z-10 mx-auto grid w-full max-w-[1240px] min-w-0 items-center gap-10 sm:gap-12 px-4 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
         {/* ——— copy ——— */}
-        <motion.div variants={container} initial="hidden" animate="show" style={{ y: isDesktop ? textY : 0 }} className="w-full min-w-0">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          style={{ y: isDesktop ? textY : 0 }}
+          className="w-full min-w-0"
+        >
           <motion.div variants={item}>
             <span className="lp-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="lp-ping absolute inline-flex h-full w-full rounded-full bg-accent" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
               </span>
-              <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--accent)' }} />
+              <Sparkles
+                className="h-3.5 w-3.5"
+                style={{ color: "var(--accent)" }}
+              />
               <span className="text-[12px] sm:text-[12.5px] font-semibold tracking-wide text-ink">
                 Modern Project Management
               </span>
@@ -81,10 +92,8 @@ export function Hero() {
             variants={item}
             className="lp-hero-title mt-5 sm:mt-6 text-ink break-words"
           >
-            Work flows better{' '}
-            <br className="inline" />
-            when everything{' '}
-            <br className="inline" />
+            Work flows better <br className="inline" />
+            when everything <br className="inline" />
             <span className="lp-text-gradient">flows together.</span>
           </motion.h1>
 
@@ -92,10 +101,14 @@ export function Hero() {
             variants={item}
             className="mt-5 sm:mt-6 max-w-lg text-[15.5px] sm:text-[17.5px] leading-relaxed text-mute"
           >
-            TaskTrace brings instant tasks, real-time collaboration, and fluid Kanban workflows into one distraction-free workspace.
+            TaskTrace brings instant tasks, real-time collaboration, and fluid
+            Kanban workflows into one distraction-free workspace.
           </motion.p>
 
-          <motion.div variants={item} className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full min-w-0">
+          <motion.div
+            variants={item}
+            className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full min-w-0"
+          >
             <Link
               to="/register"
               className="btn btn-primary h-12 sm:h-13 w-full sm:w-auto rounded-full px-6 sm:px-8 py-3.5 text-[15px] sm:text-[15.5px] font-bold shadow-[0_12px_32px_-8px_var(--glow)] hover:shadow-[0_18px_40px_-6px_var(--glow)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
@@ -114,7 +127,10 @@ export function Hero() {
             </a>
           </motion.div>
 
-          <motion.div variants={item} className="mt-8 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-x-6 w-full min-w-0">
+          <motion.div
+            variants={item}
+            className="mt-8 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-3.5 sm:gap-x-6 w-full min-w-0"
+          >
             <div className="flex items-center gap-3">
               <div className="flex">
                 {AVATARS.map((g, i) => (
@@ -123,14 +139,18 @@ export function Hero() {
                     className="lp-avatar-ring -ml-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-[10px] sm:text-[11px] font-bold text-white first:ml-0"
                     style={{ backgroundImage: g }}
                   >
-                    {['A', 'L', 'M', 'S', 'K'][i]}
+                    {["A", "L", "M", "S", "K"][i]}
                   </span>
                 ))}
               </div>
               <div>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-3 w-3 fill-warning" style={{ color: 'var(--warning)' }} />
+                    <Star
+                      key={i}
+                      className="h-3 w-3 fill-warning"
+                      style={{ color: "var(--warning)" }}
+                    />
                   ))}
                 </div>
                 <p className="mt-0.5 text-[12px] sm:text-[12.5px] font-medium text-mute">
@@ -146,7 +166,10 @@ export function Hero() {
         </motion.div>
 
         {/* ——— animated kanban ——— */}
-        <motion.div style={{ y: isDesktop ? kanbanY : 0 }} className="relative w-full min-w-0 max-w-full lg:pl-4">
+        <motion.div
+          style={{ y: isDesktop ? kanbanY : 0 }}
+          className="relative w-full min-w-0 max-w-full lg:pl-4"
+        >
           <HeroKanban />
         </motion.div>
       </div>
