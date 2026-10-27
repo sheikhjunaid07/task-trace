@@ -34,7 +34,10 @@ import {
 import { Plus, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { showToast } from "../../../utils/toast";
-import type { TypingUser, DraggingUser } from "../../../sockets/useSocketEvents";
+import type {
+  TypingUser,
+  DraggingUser,
+} from "../../../sockets/useSocketEvents";
 
 interface KanbanBoardProps {
   boardId: string;
@@ -209,11 +212,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         // Reordering within the SAME column
         const fullSorted = tasks
           .filter((t) => t.columnId === targetColumnId)
-          .sort((a, b) => a.position - b.position || a._id.localeCompare(b._id));
+          .sort(
+            (a, b) => a.position - b.position || a._id.localeCompare(b._id),
+          );
 
         const overIndex = fullSorted.findIndex((t) => t._id === overId);
         const activeIndex = fullSorted.findIndex((t) => t._id === activeId);
-        if (overIndex === -1 || activeIndex === -1 || overIndex === activeIndex) return;
+        if (overIndex === -1 || activeIndex === -1 || overIndex === activeIndex)
+          return;
 
         const newOrder = [...fullSorted];
         const [moved] = newOrder.splice(activeIndex, 1);
@@ -234,7 +240,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         // Moving to a DIFFERENT column (e.g. from "To Do" to "In Progress" or "Done")
         const targetColTasks = tasks
           .filter((t) => t.columnId === targetColumnId && t._id !== activeId)
-          .sort((a, b) => a.position - b.position || a._id.localeCompare(b._id));
+          .sort(
+            (a, b) => a.position - b.position || a._id.localeCompare(b._id),
+          );
 
         const overIndex = targetColTasks.findIndex((t) => t._id === overId);
         if (overIndex === -1) {
@@ -261,9 +269,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       }).unwrap();
       const destCol = columns.find((c) => c._id === targetColumnId);
       showToast({
-        type: 'TASK_MOVED',
-        title: 'Task Moved',
-        message: `Task moved to ${destCol?.name || 'new column'}`,
+        type: "TASK_MOVED",
+        title: "Task Moved",
+        message: `Task moved to ${destCol?.name || "new column"}`,
       });
     } catch (err) {
       console.error("Failed to move task:", err);
@@ -277,8 +285,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     try {
       await addColumn({ boardId, name: newColumnName.trim() }).unwrap();
       showToast({
-        type: 'TASK_CREATED',
-        title: 'Column Added',
+        type: "TASK_CREATED",
+        title: "Column Added",
         message: `Column "${newColumnName.trim()}" created`,
       });
       setNewColumnName("");
@@ -296,7 +304,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       onDragCancel={handleDragCancel}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-3 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-6 min-h-[460px] h-[calc(100dvh-17.5rem)] sm:h-[calc(100vh-14rem)] items-start overscroll-x-contain touch-pan-x">
+      <div className="flex gap-3 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-6 min-h-[460px] h-[calc(100dvh-17.5rem)] sm:h-[calc(100vh-14rem)] items-start overscroll-x-contain">
         <SortableContext
           items={columnIdList}
           strategy={horizontalListSortingStrategy}
@@ -304,7 +312,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           {columns.map((column) => {
             const colTasks = tasks
               .filter((t) => t.columnId === column._id)
-              .sort((a, b) => a.position - b.position || a._id.localeCompare(b._id));
+              .sort(
+                (a, b) => a.position - b.position || a._id.localeCompare(b._id),
+              );
 
             return (
               <KanbanColumn
@@ -339,7 +349,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 value={newColumnName}
                 onChange={(e) => setNewColumnName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
+                  if (e.key === "Escape") {
                     setIsAddingColumnForm(false);
                   }
                 }}
