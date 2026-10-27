@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Kanban, Menu, X, ArrowRight } from 'lucide-react';
 import ThemeSwitcher from '../../../theme/ThemeSwitcher';
 import { useAppSelector } from '../../../app/hooks';
@@ -16,10 +16,23 @@ const NAV_LINKS = [
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { scrollY } = useScroll();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-  useMotionValueEvent(scrollY, 'change', (v: number) => setScrolled(v > 24));
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 24);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';

@@ -19,12 +19,12 @@ const STATS: Stat[] = [
 ];
 
 function StatItem({ stat, delay }: { stat: Stat; delay: number }) {
-  const { ref, value } = useCountUp(stat.target, 1900, stat.decimals ?? 0);
+  const { ref } = useCountUp(stat.target, 1900, stat.decimals ?? 0);
 
   return (
     <Reveal delay={delay} className="flex flex-col items-center gap-3 px-4 text-center">
       <span className="lp-stat-num text-ink">
-        <span ref={ref}>{stat.decimals ? value.toFixed(stat.decimals) : value}</span>
+        <span ref={ref}>{stat.decimals ? (0).toFixed(stat.decimals) : '0'}</span>
         <span className="lp-text-gradient">{stat.suffix}</span>
       </span>
       <span className="text-[14px] font-semibold tracking-wide text-mute">{stat.label}</span>

@@ -31,7 +31,7 @@ export function Hero() {
   const [isDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
 
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: isDesktop ? ref : undefined,
     offset: ['start start', 'end start'],
   });
   const kanbanY = useTransform(scrollYProgress, [0, 1], [0, 110]);

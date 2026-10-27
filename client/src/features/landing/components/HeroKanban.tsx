@@ -150,20 +150,15 @@ function Card({ task }: { task: KbTask }) {
         <div className="mt-2 flex items-center gap-2">
           {task.progress !== undefined && (
             <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--text-1)_8%,transparent)]">
-              <motion.div
-                className="h-full rounded-full"
+              <div
+                className="h-full rounded-full transition-all duration-1000 ease-out"
                 style={{
                   background:
                     task.progress === 100
                       ? 'var(--success)'
                       : 'var(--accent)',
                   width: `${task.progress}%`,
-                  transformOrigin: 'left',
                 }}
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, ease: 'easeOut' }}
               />
             </div>
           )}
@@ -461,52 +456,56 @@ export function HeroKanban() {
       </motion.div>
 
       {/* live toast — desktop floating */}
-      <div className="absolute -right-4 top-16 z-20 hidden lg:block">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={toast}
-            initial={{ opacity: 0, y: 14, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.96 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="lp-glass-deep flex items-center gap-2.5 rounded-2xl px-4 py-3"
-          >
-            {(() => {
-              const T = TOASTS[toast];
-              return (
-                <>
-                  <T.icon className="h-4 w-4 shrink-0" style={{ color: T.color }} />
-                  <p className="max-w-[170px] text-[11.5px] font-medium text-ink">{T.text}</p>
-                </>
-              );
-            })()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {isDesktop && (
+        <div className="absolute -right-4 top-16 z-20">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={toast}
+              initial={{ opacity: 0, y: 14, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.96 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="lp-glass-deep flex items-center gap-2.5 rounded-2xl px-4 py-3"
+            >
+              {(() => {
+                const T = TOASTS[toast];
+                return (
+                  <>
+                    <T.icon className="h-4 w-4 shrink-0" style={{ color: T.color }} />
+                    <p className="max-w-[170px] text-[11.5px] font-medium text-ink">{T.text}</p>
+                  </>
+                );
+              })()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* live toast — mobile inline pill */}
-      <div className="mt-3 flex justify-center lg:hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={toast}
-            initial={{ opacity: 0, y: 6, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.96 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="lp-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5"
-          >
-            {(() => {
-              const T = TOASTS[toast];
-              return (
-                <>
-                  <T.icon className="h-3.5 w-3.5 shrink-0" style={{ color: T.color }} />
-                  <p className="text-[11px] font-medium text-ink">{T.text}</p>
-                </>
-              );
-            })()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {!isDesktop && (
+        <div className="mt-3 flex justify-center">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={toast}
+              initial={{ opacity: 0, y: 6, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.96 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="lp-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5"
+            >
+              {(() => {
+                const T = TOASTS[toast];
+                return (
+                  <>
+                    <T.icon className="h-3.5 w-3.5 shrink-0" style={{ color: T.color }} />
+                    <p className="text-[11px] font-medium text-ink">{T.text}</p>
+                  </>
+                );
+              })()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

@@ -38,28 +38,26 @@ export default defineConfig({
             if (
               id.includes('/node_modules/react/') ||
               id.includes('/node_modules/react-dom/') ||
-              id.includes('/node_modules/react-router/') ||
-              id.includes('/node_modules/react-router-dom/') ||
               id.includes('/node_modules/scheduler/')
             ) {
               return 'vendor-react';
             }
-            if (id.includes('@tiptap') || id.includes('prosemirror')) {
-              return 'vendor-editor';
+            if (
+              id.includes('/node_modules/react-router/') ||
+              id.includes('/node_modules/react-router-dom/')
+            ) {
+              return 'vendor-router';
             }
-            if (id.includes('@dnd-kit')) {
-              return 'vendor-dnd';
-            }
-            if (id.includes('socket.io-client')) {
-              return 'vendor-socket';
-            }
-            if (id.includes('framer-motion')) {
-              return 'vendor-framer';
-            }
-            if (id.includes('@reduxjs') || id.includes('react-redux')) {
+            if (
+              id.includes('/node_modules/@reduxjs/') ||
+              id.includes('/node_modules/react-redux/')
+            ) {
               return 'vendor-redux';
             }
-            if (id.includes('lucide-react')) {
+            if (id.includes('/node_modules/framer-motion/')) {
+              return 'vendor-framer';
+            }
+            if (id.includes('/node_modules/lucide-react/')) {
               return 'vendor-icons';
             }
           }

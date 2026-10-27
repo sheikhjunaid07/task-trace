@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useInView, useReducedMotion } from 'framer-motion';
 
 export function useCountUp(target: number, duration = 1800, decimals = 0) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const reduced = useReducedMotion();
-  const [value, setValue] = useState(reduced ? target : 0);
 
   useEffect(() => {
+    if (!ref.current) return;
     if (reduced) {
-      setValue(target);
+      ref.current.textContent = decimals ? target.toFixed(decimals) : String(target);
       return;
     }
     if (!inView) return;
@@ -18,12 +18,19 @@ export function useCountUp(target: number, duration = 1800, decimals = 0) {
     const tick = (now: number) => {
       const p = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 4);
-      setValue(parseFloat((target * eased).toFixed(decimals)));
-      if (p < 1) raf = requestAnimationFrame(tick);
+      const val = target * eased;
+      if (ref.current) {
+        ref.current.textContent = decimals ? val.toFixed(decimals) : String(Math.round(val));
+      }
+      if (p < 1) {
+        raf = requestAnimationFrame(tick);
+      } else if (ref.current) {
+        ref.current.textContent = decimals ? target.toFixed(decimals) : String(target);
+      }
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [inView, target, duration, decimals, reduced]);
 
-  return { ref, value };
+  return { ref };
 }

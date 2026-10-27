@@ -13,7 +13,7 @@ const start = async (): Promise<void> => {
     await connectDB();
     server.listen(env.port, () => {
       console.log(
-        `[server] REST API running on http://localhost:${env.port} (${env.nodeEnv})`
+        `[server] REST API running on http://localhost:${env.port} (${env.nodeEnv})`,
       );
       console.log("[server] Socket.IO attached to the HTTP server");
     });
