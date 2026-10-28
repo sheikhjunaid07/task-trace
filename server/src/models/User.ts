@@ -6,6 +6,8 @@ export interface IUser {
   email: string;
   password: string;
   avatar?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -21,8 +23,10 @@ const userSchema = new Schema<IUser>(
     },
     password: { type: String, required: true, minlength: 6, select: false },
     avatar: { type: String },
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {
@@ -33,11 +37,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = function (
-  candidatePassword: string
+  candidatePassword: string,
 ): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
 export const User = mongoose.model<IUser>("User", userSchema);
 
-export type UserDoc = mongoose.HydratedDocument<IUser> & { _id: Types.ObjectId };
+export type UserDoc = mongoose.HydratedDocument<IUser> & {
+  _id: Types.ObjectId;
+};

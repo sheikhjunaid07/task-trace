@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useLoginMutation } from '../../../api/authApi';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { setCredentials } from '../authSlice';
-import { Kanban, LogIn, AlertCircle, Sparkles, Eye, EyeOff } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useLoginMutation } from "../../../api/authApi";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { setCredentials } from "../authSlice";
+import {
+  Kanban,
+  LogIn,
+  AlertCircle,
+  Sparkles,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 export const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useAppDispatch();
@@ -19,9 +26,10 @@ export const LoginPage: React.FC = () => {
 
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-  const workspaceParam = searchParams.get('workspace') || searchParams.get('inviteWorkspace');
-  const inviteCodeParam = searchParams.get('inviteCode');
-  const redirectParam = searchParams.get('redirect');
+  const workspaceParam =
+    searchParams.get("workspace") || searchParams.get("inviteWorkspace");
+  const inviteCodeParam = searchParams.get("inviteCode");
+  const redirectParam = searchParams.get("redirect");
 
   // If user is ALREADY logged in, do not show login page!
   useEffect(() => {
@@ -29,28 +37,40 @@ export const LoginPage: React.FC = () => {
       if (inviteCodeParam) {
         navigate(`/boards/join/${inviteCodeParam}`, { replace: true });
       } else if (workspaceParam) {
-        navigate(`/dashboard?inviteWorkspace=${encodeURIComponent(workspaceParam)}`, { replace: true });
+        navigate(
+          `/dashboard?inviteWorkspace=${encodeURIComponent(workspaceParam)}`,
+          { replace: true },
+        );
       } else if (redirectParam) {
         navigate(redirectParam, { replace: true });
       } else {
-        navigate('/dashboard', { replace: true });
+        navigate("/dashboard", { replace: true });
       }
     }
-  }, [isAuthenticated, workspaceParam, inviteCodeParam, redirectParam, navigate]);
+  }, [
+    isAuthenticated,
+    workspaceParam,
+    inviteCodeParam,
+    redirectParam,
+    navigate,
+  ]);
 
   // Save pending invite in session storage for after login
   useEffect(() => {
     if (workspaceParam || inviteCodeParam) {
       sessionStorage.setItem(
-        'tasktrace_pending_invite',
-        JSON.stringify({ workspace: workspaceParam, inviteCode: inviteCodeParam })
+        "tasktrace_pending_invite",
+        JSON.stringify({
+          workspace: workspaceParam,
+          inviteCode: inviteCodeParam,
+        }),
       );
     }
   }, [workspaceParam, inviteCodeParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
+    setErrorMsg("");
 
     try {
       const res = await login({ email, password }).unwrap();
@@ -59,21 +79,32 @@ export const LoginPage: React.FC = () => {
       if (inviteCodeParam) {
         navigate(`/boards/join/${inviteCodeParam}`);
       } else if (workspaceParam) {
-        navigate(`/dashboard?inviteWorkspace=${encodeURIComponent(workspaceParam)}`);
+        navigate(
+          `/dashboard?inviteWorkspace=${encodeURIComponent(workspaceParam)}`,
+        );
       } else if (redirectParam) {
         navigate(redirectParam);
       } else {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     } catch (err: any) {
-      setErrorMsg(err.data?.message || 'Login failed. Please check credentials.');
+      setErrorMsg(
+        err.data?.message || "Login failed. Please check credentials.",
+      );
     }
   };
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 overflow-hidden">
-      <div className="login-orb" style={{ top: '-140px', right: '-120px' }} />
-      <div className="login-orb" style={{ bottom: '-160px', left: '-140px', background: 'var(--glow-2)' }} />
+      <div className="login-orb" style={{ top: "-140px", right: "-120px" }} />
+      <div
+        className="login-orb"
+        style={{
+          bottom: "-160px",
+          left: "-140px",
+          background: "var(--glow-2)",
+        }}
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -86,7 +117,9 @@ export const LoginPage: React.FC = () => {
             <Kanban className="w-7 h-7" />
           </div>
           <h1 className="text-section text-ink">Welcome Back</h1>
-          <p className="text-body text-mute mt-1.5">Sign in to your real-time Kanban workspace</p>
+          <p className="text-body text-mute mt-1.5">
+            Sign in to your real-time Kanban workspace
+          </p>
         </div>
 
         {/* Invited Workspace Banner if present */}
@@ -125,10 +158,19 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="label">Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="label mb-0">Password</label>
+              <Link
+                to={`/forgot-password${location.search}`}
+                className="text-xs font-medium hover:underline transition-colors"
+                style={{ color: "var(--accent)" }}
+              >
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -139,8 +181,8 @@ export const LoginPage: React.FC = () => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink transition-colors p-1 rounded-md focus:outline-none cursor-pointer"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -151,7 +193,11 @@ export const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          <button type="submit" disabled={isLoading} className="btn btn-primary w-full py-3.5">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="btn btn-primary w-full py-3.5"
+          >
             {isLoading ? (
               <span className="w-5 h-5 border-2 border-[color-mix(in_srgb,var(--on-accent)_35%,transparent)] border-t-[color-mix(in_srgb,var(--on-accent)_90%,transparent)] rounded-full animate-spin" />
             ) : (
@@ -164,11 +210,11 @@ export const LoginPage: React.FC = () => {
         </form>
 
         <p className="mt-8 text-center text-sm text-mute">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link
             to={`/register${location.search}`}
             className="font-semibold underline underline-offset-2"
-            style={{ color: 'var(--accent)' }}
+            style={{ color: "var(--accent)" }}
           >
             Register here
           </Link>
