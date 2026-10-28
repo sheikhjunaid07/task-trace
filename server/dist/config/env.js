@@ -23,5 +23,13 @@ exports.env = {
     cloudinaryCloudName: (process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME)?.trim(),
     cloudinaryApiKey: (process.env.CLOUDINARY_KEY || process.env.CLOUDINARY_API_KEY)?.trim(),
     cloudinaryApiSecret: (process.env.CLOUDINARY_SECRET || process.env.CLOUDINARY_API_SECRET)?.trim(),
+    emailService: process.env.EMAIL_SERVICE?.trim(),
+    emailUser: (process.env.EMAIL_USER || process.env.SMTP_USER)?.trim(),
+    emailPass: (process.env.EMAIL_PASS || process.env.SMTP_PASS)?.trim(),
+    emailFrom: process.env.EMAIL_FROM?.trim() ||
+        '"TaskTrace Kanban" <support@tasktrace.com>',
+    smtpHost: process.env.SMTP_HOST?.trim(),
+    smtpPort: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
+    smtpSecure: process.env.SMTP_SECURE === "true",
 };
 //# sourceMappingURL=env.js.map

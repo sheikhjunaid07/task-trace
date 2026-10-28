@@ -56,6 +56,7 @@ const taskSchema = new mongoose_1.Schema({
     position: { type: Number, required: true, default: 0 },
     version: { type: Number, required: true, default: 1 },
     createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
+    isArchived: { type: Boolean, default: false, index: true },
 }, { timestamps: true });
 taskSchema.index({ board: 1, columnId: 1, position: 1, _id: 1 });
 exports.Task = mongoose_1.default.model("Task", taskSchema);

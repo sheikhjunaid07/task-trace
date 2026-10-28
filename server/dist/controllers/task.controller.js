@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTask = exports.moveTask = exports.updateTask = exports.createTask = exports.getColumnTasks = exports.getBoardTasks = void 0;
+exports.archiveTask = exports.deleteTask = exports.moveTask = exports.updateTask = exports.createTask = exports.getColumnTasks = exports.getBoardTasks = void 0;
 const mongoose_1 = require("mongoose");
 const Board_1 = require("../models/Board");
 const Comment_1 = require("../models/Comment");
@@ -65,7 +65,7 @@ exports.getBoardTasks = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     if (!board)
         throw new ApiError_1.ApiError(404, "Board not found");
     assertBoardAccess(board, uid(req));
-    const tasks = await Task_1.Task.find({ board: boardId })
+    const tasks = await Task_1.Task.find({ board: boardId, isArchived: { $ne: true } })
         .sort({ position: 1, _id: 1 })
         .populate("assignees", "name email avatar");
     const taskIds = tasks.map((t) => t._id);
@@ -89,7 +89,7 @@ exports.getColumnTasks = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     if (!board)
         throw new ApiError_1.ApiError(404, "Board not found");
     assertBoardAccess(board, uid(req));
-    const tasks = await Task_1.Task.find({ board: boardId, columnId })
+    const tasks = await Task_1.Task.find({ board: boardId, columnId, isArchived: { $ne: true } })
         .sort({ position: 1, _id: 1 })
         .populate("assignees", "name email avatar");
     const taskIds = tasks.map((t) => t._id);
@@ -373,5 +373,27 @@ exports.deleteTask = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
         idempotency_1.idempotencyStore.set(opId, 200, response);
     }
     res.json(response);
+});
+exports.archiveTask = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const { taskId } = req.params;
+    const { isArchived = true } = req.body;
+    const task = await Task_1.Task.findById(taskId);
+    if (!task)
+        throw new ApiError_1.ApiError(404, "Task not found");
+    const board = await Board_1.Board.findById(task.board);
+    if (!board)
+        throw new ApiError_1.ApiError(404, "Board not found");
+    assertBoardAccess(board, uid(req));
+    task.isArchived = isArchived;
+    await task.save();
+    await task.populate("assignees", "name email avatar");
+    await activity_service_1.ActivityService.log(req.user._id, String(task.board), isArchived ? "TASK_ARCHIVED" : "TASK_RESTORED", `${isArchived ? "archived" : "restored"} task "${task.title}"`, { taskId: String(task._id) }, String(task._id));
+    sockets_1.io.to(`board:${String(task.board)}`).emit("task:archived", {
+        boardId: String(task.board),
+        taskId: String(task._id),
+        isArchived: task.isArchived,
+        task,
+    });
+    res.json(new ApiResponse_1.ApiResponse(200, isArchived ? "Task archived" : "Task restored", task));
 });
 //# sourceMappingURL=task.controller.js.map

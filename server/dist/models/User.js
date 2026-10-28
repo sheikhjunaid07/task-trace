@@ -50,6 +50,8 @@ const userSchema = new mongoose_1.Schema({
     },
     password: { type: String, required: true, minlength: 6, select: false },
     avatar: { type: String },
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
 }, { timestamps: true });
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password"))

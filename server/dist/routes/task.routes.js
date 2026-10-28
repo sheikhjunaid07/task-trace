@@ -50,6 +50,7 @@ router.get("/board/:boardId/column/:columnId", taskController.getColumnTasks);
 router.post("/board/:boardId/column/:columnId", (0, validate_middleware_1.validate)(task_validator_1.createTaskSchema), taskController.createTask);
 router.patch("/:taskId", (0, validate_middleware_1.validate)(task_validator_1.updateTaskSchema), taskController.updateTask);
 router.patch("/:taskId/move", (0, validate_middleware_1.validate)(task_validator_1.moveTaskSchema), taskController.moveTask);
+router.patch("/:taskId/archive", taskController.archiveTask);
 router.delete("/:taskId", taskController.deleteTask);
 // Comment routes under task context (matching client/src/api/commentApi.ts)
 router.get("/:taskId/comments", commentController.getCommentsByTask);

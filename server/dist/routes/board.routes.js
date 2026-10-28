@@ -63,13 +63,21 @@ router.delete("/:boardId", boardController.deleteBoard);
 router.post("/:boardId/columns", (0, validate_middleware_1.validate)(board_validator_1.addColumnSchema), boardController.addColumn);
 router.patch("/:boardId/columns/reorder", boardController.reorderColumns);
 router.patch("/:boardId/columns/:columnId", (0, validate_middleware_1.validate)(board_validator_1.renameColumnSchema), boardController.renameColumn);
+router.patch("/:boardId/columns/:columnId/wip-limit", (0, validate_middleware_1.validate)(board_validator_1.setWipLimitSchema), boardController.updateColumnWipLimit);
+router.patch("/:boardId/columns/:columnId/archive", boardController.archiveColumn);
 router.delete("/:boardId/columns/:columnId", boardController.removeColumn);
-// Members & Share Link per Board
+// Members & RBAC & Ownership
 router.post("/:boardId/members", (0, validate_middleware_1.validate)(board_validator_1.addMemberSchema), boardController.addMember);
+router.patch("/:boardId/members/:userId/role", (0, validate_middleware_1.validate)(board_validator_1.updateMemberRoleSchema), boardController.updateMemberRole);
+router.post("/:boardId/transfer-ownership", (0, validate_middleware_1.validate)(board_validator_1.transferOwnershipSchema), boardController.transferOwnership);
 router.delete("/:boardId/members/:userId", boardController.removeMember);
 router.get("/:boardId/invitations", boardController.getBoardInvitations);
 router.get("/:boardId/invite-code", boardController.getBoardInviteCode);
 router.post("/:boardId/regenerate-invite-code", boardController.regenerateBoardInviteCode);
+// Archives Management
+router.get("/:boardId/archives", boardController.getBoardArchives);
+router.post("/:boardId/archives/restore", boardController.restoreArchivedItem);
+router.delete("/:boardId/archives/permanent", boardController.permanentDeleteArchivedItem);
 // Tasks under board context
 router.get("/:boardId/tasks", taskController.getBoardTasks);
 router.post("/:boardId/columns/:columnId/tasks", (0, validate_middleware_1.validate)(task_validator_1.createTaskSchema), taskController.createTask);

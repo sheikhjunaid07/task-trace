@@ -42,14 +42,28 @@ const router = (0, express_1.Router)();
 const registerSchema = zod_1.z.object({
     name: zod_1.z.string().trim().min(2, "Name must be at least 2 characters").max(50),
     email: zod_1.z.string().email("Invalid email address"),
-    password: zod_1.z.string().min(6, "Password must be at least 6 characters").max(100),
+    password: zod_1.z
+        .string()
+        .min(6, "Password must be at least 6 characters")
+        .max(100),
 });
 const loginSchema = zod_1.z.object({
     email: zod_1.z.string().email("Invalid email address"),
     password: zod_1.z.string().min(1, "Password is required"),
 });
+const forgotPasswordSchema = zod_1.z.object({
+    email: zod_1.z.string().email("Invalid email address"),
+});
+const resetPasswordSchema = zod_1.z.object({
+    password: zod_1.z
+        .string()
+        .min(6, "Password must be at least 6 characters")
+        .max(100),
+});
 router.post("/register", (0, validate_middleware_1.validate)(registerSchema), authController.register);
 router.post("/login", (0, validate_middleware_1.validate)(loginSchema), authController.login);
 router.get("/me", auth_middleware_1.authenticate, authController.getMe);
+router.post("/forgot-password", (0, validate_middleware_1.validate)(forgotPasswordSchema), authController.forgotPassword);
+router.post("/reset-password/:token", (0, validate_middleware_1.validate)(resetPasswordSchema), authController.resetPassword);
 exports.default = router;
 //# sourceMappingURL=auth.routes.js.map
